@@ -313,66 +313,85 @@
     }
 
     // Video Expand on Scroll Effect
-    document.addEventListener('DOMContentLoaded', () => {
+    (() => {
       const videoSection = document.getElementById('video');
-      const videoContainer = document.querySelector('.video-container');
-      const videoFeed = document.querySelector('.video-feed');
-      
-      if (videoSection && videoContainer && videoFeed) {
-        const handleScroll = () => {
-          const rect = videoSection.getBoundingClientRect();
-          const viewportHeight = window.innerHeight;
-          
-          // Calculate progress of scroll through the section
-          const totalScroll = rect.height - viewportHeight;
-          if (totalScroll <= 0) return;
-          
-          let progress = -rect.top / totalScroll;
-          progress = Math.max(0, Math.min(1, progress));
-          
-          let scaleProgress = 0;
-          if (progress < 0.4) {
-            // Expand phase
-            scaleProgress = progress / 0.4;
-          } else if (progress <= 0.6) {
-            // Full-screen focus phase
-            scaleProgress = 1;
-          } else {
-            // Collapse phase
-            scaleProgress = 1 - (progress - 0.6) / 0.4;
-          }
-          
-          // Cubic ease-in-out curve
-          const easedProgress = scaleProgress * scaleProgress * (3 - 2 * scaleProgress);
-          
-          // Interpolate values
-          const initialWidth = window.innerWidth <= 1024 ? window.innerWidth - 64 : Math.min(1152, window.innerWidth - 128);
-          const targetWidth = window.innerWidth;
-          const currentWidth = initialWidth + (targetWidth - initialWidth) * easedProgress;
-          
-          const initialHeight = window.innerWidth <= 1024 ? 350 : 646;
-          const targetHeight = window.innerHeight;
-          const currentHeight = initialHeight + (targetHeight - initialHeight) * easedProgress;
-          
-          const currentRadius = 12 * (1 - easedProgress);
-          const borderAlpha = 0.2 * (1 - easedProgress);
-          const currentVideoOpacity = 0.5 + 0.5 * easedProgress;
-          
-          // Update styles
-          videoContainer.style.width = `${currentWidth}px`;
-          videoContainer.style.height = `${currentHeight}px`;
-          videoContainer.style.borderRadius = `${currentRadius}px`;
-          videoContainer.style.borderColor = `rgba(68, 71, 72, ${borderAlpha})`;
-          videoFeed.style.opacity = currentVideoOpacity;
-        };
+      if (!videoSection) return;
+
+      const videoStickyWrapper = videoSection.querySelector('.video-sticky-wrapper');
+      const videoContainer = videoSection.querySelector('.video-container');
+      const videoFeed = videoSection.querySelector('.video-feed');
+      if (!videoStickyWrapper || !videoContainer || !videoFeed) return;
+
+      const handleScroll = () => {
+        const rect = videoSection.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
         
-        window.addEventListener('scroll', () => {
-          requestAnimationFrame(handleScroll);
-        });
-        window.addEventListener('resize', handleScroll);
-        handleScroll();
-      }
-    });
+        // Calculate progress of scroll through the section
+        const totalScroll = rect.height - viewportHeight;
+        if (totalScroll <= 0) return;
+        
+        const progress = -rect.top / totalScroll;
+        
+        // If we are completely outside the sticky scroll range, clear inline styles
+        if (progress <= 0 || progress >= 1) {
+          videoContainer.style.width = '';
+          videoContainer.style.height = '';
+          videoContainer.style.borderRadius = '';
+          videoContainer.style.borderColor = '';
+          videoFeed.style.opacity = '';
+          videoStickyWrapper.style.zIndex = '';
+          return;
+        }
+        
+        let scaleProgress = 0;
+        if (progress < 0.4) {
+          // Expand phase
+          scaleProgress = progress / 0.4;
+        } else if (progress <= 0.6) {
+          // Full-screen focus phase
+          scaleProgress = 1;
+        } else {
+          // Collapse phase
+          scaleProgress = 1 - (progress - 0.6) / 0.4;
+        }
+        
+        // Cubic ease-in-out curve
+        const easedProgress = scaleProgress * scaleProgress * (3 - 2 * scaleProgress);
+        
+        // Interpolate values
+        const initialWidth = window.innerWidth <= 1024 ? window.innerWidth - 64 : Math.min(1152, window.innerWidth - 128);
+        const targetWidth = window.innerWidth;
+        const currentWidth = initialWidth + (targetWidth - initialWidth) * easedProgress;
+        
+        const initialHeight = window.innerWidth <= 1024 ? 350 : 646;
+        const targetHeight = window.innerHeight;
+        const currentHeight = initialHeight + (targetHeight - initialHeight) * easedProgress;
+        
+        const currentRadius = 12 * (1 - easedProgress);
+        const borderAlpha = 0.2 * (1 - easedProgress);
+        const currentVideoOpacity = 0.5 + 0.5 * easedProgress;
+        
+        // Update styles
+        videoContainer.style.width = `${currentWidth}px`;
+        videoContainer.style.height = `${currentHeight}px`;
+        videoContainer.style.borderRadius = `${currentRadius}px`;
+        videoContainer.style.borderColor = `rgba(68, 71, 72, ${borderAlpha})`;
+        videoFeed.style.opacity = currentVideoOpacity;
+        
+        // Cover navigation bar (z-index: 100) when expanding or expanded
+        if (easedProgress > 0) {
+          videoStickyWrapper.style.zIndex = '150';
+        } else {
+          videoStickyWrapper.style.zIndex = '';
+        }
+      };
+      
+      window.addEventListener('scroll', () => {
+        requestAnimationFrame(handleScroll);
+      });
+      window.addEventListener('resize', handleScroll);
+      handleScroll();
+    })();
   </script>
   <script src="matrix-effect.js"></script>
 </body>
