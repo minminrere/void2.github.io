@@ -122,31 +122,37 @@ document.addEventListener('DOMContentLoaded', () => {
     body, a, button, [role="button"], .platform-btn, .tag, .submit-btn, .play-icon-box {
       cursor: none !important; /* Hide native cursor for premium feeling */
     }
-    .custom-cursor-dot {
+    .custom-cursor-node {
       position: fixed;
       top: 0;
       left: 0;
-      width: 8px;
-      height: 8px;
-      background-color: #ff4d4d;
-      border-radius: 50%;
       pointer-events: none;
       z-index: 999999;
-      transform: translate3d(0, 0, 0);
+      transform: translate3d(0, 0, 0) translate(-50%, -50%);
       mix-blend-mode: screen;
       backface-visibility: hidden;
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      font-weight: 800;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      width: 32px;
+      height: 32px;
     }
-    /* The leading cursor tip */
-    .custom-cursor-dot:first-child {
+    /* The leading cursor tip ring */
+    .custom-cursor-node:first-child {
       width: 16px;
       height: 16px;
       background-color: transparent;
       border: 1.5px solid #ff4d4d;
+      border-radius: 50%;
       box-shadow: 0 0 8px rgba(255, 77, 77, 0.6);
       transition: width 0.2s, height 0.2s, background-color 0.2s, border-color 0.2s;
     }
     /* Interactive expansion on hover */
-    body.cursor-hovering .custom-cursor-dot:first-child {
+    body.cursor-hovering .custom-cursor-node:first-child {
       width: 28px;
       height: 28px;
       background-color: rgba(255, 77, 77, 0.15);
@@ -155,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     /* Hide custom cursor on touchscreens */
     @media (hover: none) and (pointer: coarse) {
-      .custom-cursor-dot {
+      .custom-cursor-node {
         display: none !important;
       }
       body, a, button, [role="button"], .platform-btn, .tag, .submit-btn, .play-icon-box {
@@ -176,28 +182,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Create DOM elements for the trailing nodes
   for (let i = 0; i < numNodes; i++) {
-    const dot = document.createElement('div');
-    dot.className = 'custom-cursor-dot';
+    const nodeEl = document.createElement('div');
+    nodeEl.className = 'custom-cursor-node';
     
-    // Taper the sizes of the trail dots
+    // Setup the Matrix characters for the trailing nodes
     if (i > 0) {
-      const size = Math.max(2, 8 - (i * 0.6));
-      dot.style.width = `${size}px`;
-      dot.style.height = `${size}px`;
-      dot.style.opacity = (1.0 - (i / numNodes) * 0.7).toString();
-      dot.style.backgroundColor = `rgb(255, ${Math.floor(77 - i * 4)}, ${Math.floor(77 - i * 4)})`;
-      if (i === 1) {
-        dot.style.boxShadow = '0 0 6px rgba(255, 77, 77, 0.8)';
-      }
+      // Pick a random letter to start
+      nodeEl.innerText = matrixLetters[Math.floor(Math.random() * matrixLetters.length)];
+      // Taper the font size
+      const fontSize = Math.max(7, 16 - (i * 1.0));
+      nodeEl.style.fontSize = `${fontSize}px`;
+      nodeEl.style.opacity = (1.0 - (i / numNodes) * 0.8).toString();
+      
+      // Cyberpunk deep red fading effect for the tail nodes
+      const redIntensity = Math.floor(255 - (i * 12));
+      const greenIntensity = Math.floor(77 - (i * 6));
+      const nodeColor = `rgb(${redIntensity}, ${Math.max(0, greenIntensity)}, ${Math.max(0, greenIntensity)})`;
+      nodeEl.style.color = nodeColor;
+      nodeEl.style.textShadow = `0 0 5px ${nodeColor}`;
     }
     
-    cursorContainer.appendChild(dot);
+    cursorContainer.appendChild(nodeEl);
     
     nodes.push({
-      el: dot,
+      el: nodeEl,
       x: cursorMouse.x,
-      y: cursorMouse.y,
-      size: i === 0 ? 16 : Math.max(2, 8 - (i * 0.6))
+      y: cursorMouse.y
     });
   }
 
@@ -237,8 +247,13 @@ document.addEventListener('DOMContentLoaded', () => {
       n.x += (prev.x - n.x) * ease;
       n.y += (prev.y - n.y) * ease;
       
-      // Update element position using hardware accelerated transform
-      n.el.style.transform = `translate3d(${n.x - n.size / 2}px, ${n.y - n.size / 2}px, 0)`;
+      // Update element position using hardware accelerated transform and 50% shift to center
+      n.el.style.transform = `translate3d(${n.x}px, ${n.y}px, 0) translate(-50%, -50%)`;
+      
+      // Matrix rain effect: randomly scramble the trailing characters to make them flicker
+      if (i > 0 && Math.random() > 0.45) {
+        n.el.innerText = matrixLetters[Math.floor(Math.random() * matrixLetters.length)];
+      }
       
       prev = n;
     }
