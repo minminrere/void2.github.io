@@ -621,7 +621,7 @@ section {
 .video-feed img, .video-feed video {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Back to cover since the container maintains a perfect 16:9 aspect ratio */
+  object-fit: fill; /* Stretches the video to fill the viewport completely without cropping */
 }
 
 .video-gradient {
