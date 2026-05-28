@@ -39,82 +39,81 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // 2. Global Interactive Matrix Rain Background
-  if (document.body.classList.contains('relics-body')) {
-    return;
-  }
-  const globalCanvas = document.createElement('canvas');
-  globalCanvas.id = 'global-matrix-bg';
-  Object.assign(globalCanvas.style, {
-    position: 'fixed',
-    top: '0',
-    left: '0',
-    width: '100vw',
-    height: '100vh',
-    zIndex: '1', /* High enough to overlay, but pointer-events none ignores clicks */
-    pointerEvents: 'none',
-    opacity: '0.2', /* Subtle overlay */
-    mixBlendMode: 'screen' /* Black pixels become transparent, red pixels glow over content */
-  });
-  document.body.prepend(globalCanvas);
+  if (!document.body.classList.contains('relics-body')) {
+    const globalCanvas = document.createElement('canvas');
+    globalCanvas.id = 'global-matrix-bg';
+    Object.assign(globalCanvas.style, {
+      position: 'fixed',
+      top: '0',
+      left: '0',
+      width: '100vw',
+      height: '100vh',
+      zIndex: '1', /* High enough to overlay, but pointer-events none ignores clicks */
+      pointerEvents: 'none',
+      opacity: '0.2', /* Subtle overlay */
+      mixBlendMode: 'screen' /* Black pixels become transparent, red pixels glow over content */
+    });
+    document.body.prepend(globalCanvas);
 
-  const gCtx = globalCanvas.getContext('2d');
-  let gColumns, gDrops = [];
-  const gFontSize = 14;
+    const gCtx = globalCanvas.getContext('2d');
+    let gColumns, gDrops = [];
+    const gFontSize = 14;
 
-  const resizeGlobal = () => {
-    globalCanvas.width = window.innerWidth;
-    globalCanvas.height = window.innerHeight;
-    gColumns = Math.floor(globalCanvas.width / gFontSize);
-    gDrops = [];
-    for (let x = 0; x < gColumns; x++) {
-      gDrops[x] = Math.random() * (globalCanvas.height / gFontSize); // Start at random heights
-    }
-  };
-  resizeGlobal();
-  window.addEventListener('resize', resizeGlobal);
-
-  // Mouse interaction tracker
-  let mouseX = -100;
-  let mouseY = -100;
-  document.addEventListener('mousemove', (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-  });
-
-  function drawGlobalMatrix() {
-    // Fade the canvas to black. In "screen" blend mode, black is perfectly transparent.
-    gCtx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-    gCtx.fillRect(0, 0, globalCanvas.width, globalCanvas.height);
-    
-    gCtx.font = gFontSize + 'px "JetBrains Mono", monospace';
-    
-    for (let i = 0; i < gDrops.length; i++) {
-      const text = matrixLetters[Math.floor(Math.random() * matrixLetters.length)];
-      
-      const dropX = i * gFontSize;
-      const dropY = gDrops[i] * gFontSize;
-      
-      // Calculate distance from mouse to the falling character
-      const dist = Math.sqrt(Math.pow(mouseX - dropX, 2) + Math.pow(mouseY - dropY, 2));
-      
-      // If mouse is near, make it bright red (Interactive effect)
-      if (dist < 150) {
-        gCtx.fillStyle = '#ff4d4d'; 
-      } else {
-        gCtx.fillStyle = '#960703'; // VOID Red Accent
+    const resizeGlobal = () => {
+      globalCanvas.width = window.innerWidth;
+      globalCanvas.height = window.innerHeight;
+      gColumns = Math.floor(globalCanvas.width / gFontSize);
+      gDrops = [];
+      for (let x = 0; x < gColumns; x++) {
+        gDrops[x] = Math.random() * (globalCanvas.height / gFontSize); // Start at random heights
       }
+    };
+    resizeGlobal();
+    window.addEventListener('resize', resizeGlobal);
+
+    // Mouse interaction tracker
+    let mouseX = -100;
+    let mouseY = -100;
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+
+    function drawGlobalMatrix() {
+      // Fade the canvas to black. In "screen" blend mode, black is perfectly transparent.
+      gCtx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      gCtx.fillRect(0, 0, globalCanvas.width, globalCanvas.height);
       
-      gCtx.fillText(text, dropX, dropY);
+      gCtx.font = gFontSize + 'px "JetBrains Mono", monospace';
       
-      // Reset drop to top randomly
-      if (dropY > globalCanvas.height && Math.random() > 0.975) {
-        gDrops[i] = 0;
+      for (let i = 0; i < gDrops.length; i++) {
+        const text = matrixLetters[Math.floor(Math.random() * matrixLetters.length)];
+        
+        const dropX = i * gFontSize;
+        const dropY = gDrops[i] * gFontSize;
+        
+        // Calculate distance from mouse to the falling character
+        const dist = Math.sqrt(Math.pow(mouseX - dropX, 2) + Math.pow(mouseY - dropY, 2));
+        
+        // If mouse is near, make it bright red (Interactive effect)
+        if (dist < 150) {
+          gCtx.fillStyle = '#ff4d4d'; 
+        } else {
+          gCtx.fillStyle = '#960703'; // VOID Red Accent
+        }
+        
+        gCtx.fillText(text, dropX, dropY);
+        
+        // Reset drop to top randomly
+        if (dropY > globalCanvas.height && Math.random() > 0.975) {
+          gDrops[i] = 0;
+        }
+        gDrops[i]++;
       }
-      gDrops[i]++;
     }
+    
+    setInterval(drawGlobalMatrix, 50);
   }
-  
-  setInterval(drawGlobalMatrix, 50);
 
   // 3. Custom Glowing Cursor Trail (Lerping Node Chain)
   const styleEl = document.createElement('style');
