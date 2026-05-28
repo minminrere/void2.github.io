@@ -3,7 +3,7 @@ const matrixLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
 
 document.addEventListener('DOMContentLoaded', () => {
   // 1. Hover Scramble Effect for Links and Buttons
-  const interactElements = document.querySelectorAll('.nav-link, .nav-button, .btn-primary, .btn-secondary, .tag, .footer-link, .hero-title, .team-title');
+  const interactElements = document.querySelectorAll('.nav-link, .nav-button, .btn-primary, .btn-secondary, .footer-link, .hero-title');
   
   interactElements.forEach(el => {
     el.addEventListener('mouseover', event => {
