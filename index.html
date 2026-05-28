@@ -340,6 +340,7 @@
           videoContainer.style.borderRadius = '';
           videoContainer.style.borderColor = '';
           videoContainer.style.maxWidth = '';
+          videoContainer.style.aspectRatio = '';
           videoFeed.style.opacity = '';
           videoStickyWrapper.style.zIndex = '';
           return;
@@ -390,6 +391,7 @@
         videoContainer.style.width = `${currentWidth}px`;
         videoContainer.style.height = `${currentHeight}px`;
         videoContainer.style.maxWidth = easedProgress > 0 ? 'none' : '';
+        videoContainer.style.aspectRatio = easedProgress > 0 ? 'auto' : '';
         videoContainer.style.borderRadius = `${currentRadius}px`;
         videoContainer.style.borderColor = `rgba(68, 71, 72, ${borderAlpha})`;
         videoFeed.style.opacity = currentVideoOpacity;
