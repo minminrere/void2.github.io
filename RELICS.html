@@ -241,16 +241,23 @@
         let isVisible = false;
         let isRunning = false;
 
-        // Helper to maintain canvas dimensions relative to natural source resolution
+        // Use active client rendering boundaries to prevent layout swelling and protect grid integrity
         const initCanvasSize = () => {
-          canvas.width = img.naturalWidth || img.clientWidth || 300;
-          canvas.height = img.naturalHeight || img.clientHeight || 450;
+          const rect = img.getBoundingClientRect();
+          canvas.width = Math.round(rect.width) || img.clientWidth || 300;
+          canvas.height = Math.round(rect.height) || img.clientHeight || 450;
+        };
+
+        // When image completely loads, sync sizes and trigger if active
+        img.onload = () => {
+          initCanvasSize();
+          if (isVisible && !isRunning) {
+            triggerGlitch();
+          }
         };
 
         if (img.complete) {
           initCanvasSize();
-        } else {
-          img.onload = initCanvasSize;
         }
 
         // 2. Downsample -> Upsample core algorithm with Neon Red & Neon Green splits
@@ -344,6 +351,11 @@
         };
 
         const triggerGlitch = () => {
+          // Safety check: if image data isn't ready, do not activate visual overlay
+          if (!img.complete || img.naturalWidth === 0) {
+            canvas.classList.remove('active');
+            return;
+          }
           if (isRunning) {
             cancelAnimationFrame(animationFrameId);
           }
