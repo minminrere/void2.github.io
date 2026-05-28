@@ -333,7 +333,8 @@
         const progress = -rect.top / totalScroll;
         
         // If we are completely outside the sticky scroll range, clear inline styles
-        if (progress <= 0 || progress >= 1) {
+        // Allow slightly more margin to prevent abrupt jumps during high-speed scrolls
+        if (progress <= -0.15 || progress >= 1.15) {
           videoContainer.style.width = '';
           videoContainer.style.height = '';
           videoContainer.style.borderRadius = '';
@@ -344,18 +345,18 @@
         }
         
         let scaleProgress = 0;
-        if (progress < 0.7) {
-          // Expand phase (Very slow expansion spanning 70% of scroll)
-          scaleProgress = progress / 0.7;
-        } else if (progress <= 0.85) {
-          // Full-screen focus phase
+        if (progress <= 0) {
+          // Fully expanded when starting or before entering the sticky zone
           scaleProgress = 1;
+        } else if (progress <= 0.7) {
+          // Gradually shrink to original card size as we scroll down to 70% of the track
+          scaleProgress = 1 - (progress / 0.7);
         } else {
-          // Collapse phase
-          scaleProgress = 1 - (progress - 0.85) / 0.15;
+          // Stay at original card size for the remainder of the scroll
+          scaleProgress = 0;
         }
         
-        // Cubic ease-in-out curve
+        // Cubic ease-in-out curve for ultra-premium organic motion
         const easedProgress = scaleProgress * scaleProgress * (3 - 2 * scaleProgress);
         
         // Interpolate values keeping a mathematically perfect 16:9 aspect ratio at all times
@@ -398,7 +399,7 @@
         videoFeed.style.opacity = currentVideoOpacity;
         
         // Cover navigation bar (z-index: 100) when expanding or expanded
-        if (easedProgress > 0) {
+        if (easedProgress > 0.05) {
           videoStickyWrapper.style.zIndex = '150';
         } else {
           videoStickyWrapper.style.zIndex = '';
