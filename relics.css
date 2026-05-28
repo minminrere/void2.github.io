@@ -92,13 +92,13 @@
 
 .member-grid {
   display: grid;
-  grid-template-columns: 5fr 7fr;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
   gap: 60px;
   position: relative;
 }
 
 .grid-reverse {
-  grid-template-columns: 7fr 5fr;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
 }
 
 .bg-structural-left, .bg-structural-right {
