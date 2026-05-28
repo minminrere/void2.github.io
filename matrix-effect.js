@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // 2. Global Interactive Matrix Rain Background
-  if (!document.body.classList.contains('relics-body')) {
+  if (true) { // Enabled globally across all pages, including RELICS.html
     const globalCanvas = document.createElement('canvas');
     globalCanvas.id = 'global-matrix-bg';
     Object.assign(globalCanvas.style, {
