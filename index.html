@@ -358,23 +358,32 @@
         // Cubic ease-in-out curve
         const easedProgress = scaleProgress * scaleProgress * (3 - 2 * scaleProgress);
         
-        // Interpolate values matching CSS media queries exactly
-        let initialWidth, initialHeight;
+        // Interpolate values keeping a mathematically perfect 16:9 aspect ratio at all times
+        const ratio = 16 / 9;
+        let initialWidth;
         if (window.innerWidth <= 768) {
           initialWidth = window.innerWidth - 32;
-          initialHeight = 250;
         } else if (window.innerWidth <= 1024) {
           initialWidth = window.innerWidth - 64;
-          initialHeight = 350;
         } else {
           initialWidth = Math.min(1152, window.innerWidth - 128);
-          initialHeight = 646;
+        }
+        const initialHeight = initialWidth / ratio;
+
+        // Calculate maximum target size that fits in viewport preserving 16:9
+        let targetWidth, targetHeight;
+        const viewportRatio = window.innerWidth / window.innerHeight;
+        if (viewportRatio > ratio) {
+          // Viewport is wider than 16:9 (Pillarbox/cinematic layout)
+          targetHeight = window.innerHeight;
+          targetWidth = window.innerHeight * ratio;
+        } else {
+          // Viewport is taller than 16:9 (Letterbox layout, standard on mobile)
+          targetWidth = window.innerWidth;
+          targetHeight = window.innerWidth / ratio;
         }
 
-        const targetWidth = window.innerWidth;
         const currentWidth = initialWidth + (targetWidth - initialWidth) * easedProgress;
-        
-        const targetHeight = window.innerHeight;
         const currentHeight = initialHeight + (targetHeight - initialHeight) * easedProgress;
         
         const currentRadius = 12 * (1 - easedProgress);
