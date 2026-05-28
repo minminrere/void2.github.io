@@ -273,6 +273,9 @@
           const w = canvas.width;
           const h = canvas.height;
 
+          // Safety guard to prevent invalid drawing dimension exceptions
+          if (w <= 0 || h <= 0) return;
+
           ctx.clearRect(0, 0, w, h);
 
           if (currentPixelSize <= 1.05) {
@@ -284,6 +287,9 @@
           // Downsample grid calculation
           const sw = Math.max(1, Math.round(w / currentPixelSize));
           const sh = Math.max(1, Math.round(h / currentPixelSize));
+
+          // Safety guard for downsample sizes
+          if (sw <= 0 || sh <= 0) return;
 
           // Draw downscaled to offscreen buffer
           const offscreen = document.createElement('canvas');
@@ -343,8 +349,17 @@
           if (progress < 1 && isVisible && isRunning) {
             animationFrameId = requestAnimationFrame(animate);
           } else {
-            // Remove visibility class once finished to reveal original image below
+            // Remove visibility class once finished to reveal original image below smoothly
             canvas.classList.remove('active');
+            canvas.style.opacity = '0'; // Force fade out inline
+            
+            // Clean up drawing buffer completely after transition duration (300ms)
+            setTimeout(() => {
+              if (!isRunning) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+              }
+            }, 300);
+            
             isRunning = false;
             animationFrameId = null;
           }
@@ -354,6 +369,7 @@
           // Safety check: if image data isn't ready, do not activate visual overlay
           if (!img.complete || img.naturalWidth === 0) {
             canvas.classList.remove('active');
+            canvas.style.opacity = '0';
             return;
           }
           if (isRunning) {
@@ -363,6 +379,7 @@
           startTime = null;
           isRunning = true;
           canvas.classList.add('active');
+          canvas.style.opacity = '1'; // Force show overlay inline
           animationFrameId = requestAnimationFrame(animate);
         };
 
@@ -384,6 +401,7 @@
               if (isRunning) {
                 cancelAnimationFrame(animationFrameId);
                 canvas.classList.remove('active');
+                canvas.style.opacity = '0';
                 isRunning = false;
               }
             }
