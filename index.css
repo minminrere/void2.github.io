@@ -39,7 +39,7 @@ a {
   color: inherit;
 }
 
-img {
+img, video {
   max-width: 100%;
   display: block;
 }
@@ -135,6 +135,7 @@ section {
   inset: 0;
   background: white;
   mix-blend-mode: saturation;
+  transition: opacity 0.5s ease;
 }
 
 /* 01 Hero Section */
@@ -160,8 +161,19 @@ section {
   opacity: 0.5;
   mix-blend-mode: luminosity;
   overflow: hidden;
+  transition: opacity 0.5s ease, mix-blend-mode 0.5s ease;
 }
-.hero-metallic-face img {
+
+.hero-section:hover .hero-metallic-face {
+  opacity: 1;
+  mix-blend-mode: normal;
+}
+
+.hero-section:hover .hero-metallic-face .blend-saturation {
+  opacity: 0;
+}
+
+.hero-metallic-face img, .hero-metallic-face video {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -360,7 +372,7 @@ section {
   position: absolute;
   inset: 0;
 }
-.image-overlay img, .image-overlay canvas {
+.image-overlay img, .image-overlay video, .image-overlay canvas {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -440,8 +452,18 @@ section {
 .decay-image {
   position: absolute;
   inset: 0;
+  opacity: 0.6;
+  transition: opacity 0.5s ease;
 }
-.decay-image img {
+
+.preview-main:hover .decay-image {
+  opacity: 1;
+}
+
+.preview-main:hover .decay-image .blend-saturation {
+  opacity: 0;
+}
+.decay-image img, .decay-image video {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -499,8 +521,19 @@ section {
   position: absolute;
   inset: 0;
   mix-blend-mode: lighten;
+  opacity: 0.4;
+  transition: opacity 0.5s ease, mix-blend-mode 0.5s ease;
 }
-.corrupt-terminal img {
+
+.terminal-box:hover .corrupt-terminal {
+  opacity: 1;
+  mix-blend-mode: normal;
+}
+
+.terminal-box:hover .corrupt-terminal .blend-saturation {
+  opacity: 0;
+}
+.corrupt-terminal img, .corrupt-terminal video {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -559,9 +592,8 @@ section {
 .video-feed {
   position: absolute;
   inset: 0;
-  mix-blend-mode: luminosity;
 }
-.video-feed img {
+.video-feed img, .video-feed video {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -571,6 +603,13 @@ section {
   position: absolute;
   inset: 0;
   background: linear-gradient(to top, rgba(0,0,0,0.5), transparent 50%);
+}
+
+.video-top-left-info {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  opacity: 0.8;
 }
 
 .video-center-info {
@@ -637,7 +676,7 @@ section {
   justify-content: center;
   height: 512px;
 }
-.teaser-image-box img {
+.teaser-image-box img, .teaser-image-box video {
   width: 512px;
   height: 512px;
   object-fit: cover;
