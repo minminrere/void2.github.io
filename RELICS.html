@@ -233,6 +233,7 @@
         // 1. Injected Overlay Canvas element
         const canvas = document.createElement('canvas');
         canvas.className = 'pixelate-canvas';
+        canvas.style.display = 'none'; // Hide by default until triggered
         box.appendChild(canvas);
         const ctx = canvas.getContext('2d');
 
@@ -353,9 +354,10 @@
             canvas.classList.remove('active');
             canvas.style.opacity = '0'; // Force fade out inline
             
-            // Clean up drawing buffer completely after transition duration (300ms)
+            // Clean up drawing buffer and remove completely from display tree after fade (300ms)
             setTimeout(() => {
               if (!isRunning) {
+                canvas.style.display = 'none'; // Unrender from active display tree
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
               }
             }, 300);
@@ -370,14 +372,17 @@
           if (!img.complete || img.naturalWidth === 0) {
             canvas.classList.remove('active');
             canvas.style.opacity = '0';
+            canvas.style.display = 'none';
             return;
           }
-          if (isRunning) {
-            cancelAnimationFrame(animationFrameId);
-          }
+          
+          // State Lock: If already rendering, ignore duplicate trigger calls (prevents event floods)
+          if (isRunning) return;
+
           initCanvasSize();
           startTime = null;
           isRunning = true;
+          canvas.style.display = 'block'; // Make canvas visible in DOM tree
           canvas.classList.add('active');
           canvas.style.opacity = '1'; // Force show overlay inline
           animationFrameId = requestAnimationFrame(animate);
@@ -385,7 +390,7 @@
 
         // 4. Trigger on Mouse Hover
         box.addEventListener('mouseenter', () => {
-          if (isVisible) {
+          if (isVisible && !isRunning) {
             triggerGlitch();
           }
         });
@@ -395,13 +400,14 @@
           entries.forEach(entry => {
             isVisible = entry.isIntersecting;
             if (isVisible) {
-              triggerGlitch();
+              if (!isRunning) triggerGlitch();
             } else {
               // Pause loop when off-screen to preserve performance
               if (isRunning) {
                 cancelAnimationFrame(animationFrameId);
                 canvas.classList.remove('active');
                 canvas.style.opacity = '0';
+                canvas.style.display = 'none';
                 isRunning = false;
               }
             }
