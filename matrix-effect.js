@@ -115,4 +115,136 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   
   setInterval(drawGlobalMatrix, 50);
+
+  // 3. Custom Glowing Cursor Trail (Lerping Node Chain)
+  const styleEl = document.createElement('style');
+  styleEl.innerHTML = `
+    body, a, button, [role="button"], .platform-btn, .tag, .submit-btn, .play-icon-box {
+      cursor: none !important; /* Hide native cursor for premium feeling */
+    }
+    .custom-cursor-dot {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 8px;
+      height: 8px;
+      background-color: #ff4d4d;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 999999;
+      transform: translate3d(0, 0, 0);
+      mix-blend-mode: screen;
+      backface-visibility: hidden;
+    }
+    /* The leading cursor tip */
+    .custom-cursor-dot:first-child {
+      width: 16px;
+      height: 16px;
+      background-color: transparent;
+      border: 1.5px solid #ff4d4d;
+      box-shadow: 0 0 8px rgba(255, 77, 77, 0.6);
+      transition: width 0.2s, height 0.2s, background-color 0.2s, border-color 0.2s;
+    }
+    /* Interactive expansion on hover */
+    body.cursor-hovering .custom-cursor-dot:first-child {
+      width: 28px;
+      height: 28px;
+      background-color: rgba(255, 77, 77, 0.15);
+      border-color: #ff3333;
+      box-shadow: 0 0 12px rgba(255, 51, 51, 0.8);
+    }
+    /* Hide custom cursor on touchscreens */
+    @media (hover: none) and (pointer: coarse) {
+      .custom-cursor-dot {
+        display: none !important;
+      }
+      body, a, button, [role="button"], .platform-btn, .tag, .submit-btn, .play-icon-box {
+        cursor: auto !important;
+      }
+    }
+  `;
+  document.head.appendChild(styleEl);
+
+  const cursorContainer = document.createElement('div');
+  cursorContainer.id = 'custom-cursor-container';
+  document.body.appendChild(cursorContainer);
+
+  const numNodes = 12;
+  const nodes = [];
+  const ease = 0.15;
+  const cursorMouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+
+  // Create DOM elements for the trailing nodes
+  for (let i = 0; i < numNodes; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'custom-cursor-dot';
+    
+    // Taper the sizes of the trail dots
+    if (i > 0) {
+      const size = Math.max(2, 8 - (i * 0.6));
+      dot.style.width = `${size}px`;
+      dot.style.height = `${size}px`;
+      dot.style.opacity = (1.0 - (i / numNodes) * 0.7).toString();
+      dot.style.backgroundColor = `rgb(255, ${Math.floor(77 - i * 4)}, ${Math.floor(77 - i * 4)})`;
+      if (i === 1) {
+        dot.style.boxShadow = '0 0 6px rgba(255, 77, 77, 0.8)';
+      }
+    }
+    
+    cursorContainer.appendChild(dot);
+    
+    nodes.push({
+      el: dot,
+      x: cursorMouse.x,
+      y: cursorMouse.y,
+      size: i === 0 ? 16 : Math.max(2, 8 - (i * 0.6))
+    });
+  }
+
+  // Update mouse position
+  document.addEventListener('mousemove', (e) => {
+    cursorMouse.x = e.clientX;
+    cursorMouse.y = e.clientY;
+  });
+
+  // Hover states to scale the cursor tip
+  const updateHoverState = (isHovering) => {
+    if (isHovering) {
+      document.body.classList.add('cursor-hovering');
+    } else {
+      document.body.classList.remove('cursor-hovering');
+    }
+  };
+
+  const addHoverListeners = () => {
+    const interactive = document.querySelectorAll('a, button, [role="button"], .platform-btn, .tag, .submit-btn, .play-icon-box');
+    interactive.forEach(el => {
+      el.addEventListener('mouseenter', () => updateHoverState(true));
+      el.addEventListener('mouseleave', () => updateHoverState(false));
+    });
+  };
+  addHoverListeners();
+  
+  // Re-run hover listener attachments periodically to cover dynamic elements
+  setInterval(addHoverListeners, 2000);
+
+  // The custom animation tick loop using the exact user-specified formula
+  function tick() {
+    let prev = cursorMouse;
+    for (let i = 0; i < nodes.length; i++) {
+      const n = nodes[i];
+      // exact user logic:
+      n.x += (prev.x - n.x) * ease;
+      n.y += (prev.y - n.y) * ease;
+      
+      // Update element position using hardware accelerated transform
+      n.el.style.transform = `translate3d(${n.x - n.size / 2}px, ${n.y - n.size / 2}px, 0)`;
+      
+      prev = n;
+    }
+    requestAnimationFrame(tick);
+  }
+  
+  // Start the tick loop
+  tick();
 });
