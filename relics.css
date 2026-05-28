@@ -371,3 +371,66 @@
     padding: 60px 32px;
   }
 }
+
+/* Pixelate Glitch Animations */
+.team-member-section {
+  transition: filter 0.3s ease, transform 0.3s ease;
+  will-change: filter, transform;
+}
+
+/* Hover trigger for glitch */
+.team-member-section:hover {
+  animation: pixelate-glitch-anim 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+/* Scroll-in active glitch trigger class managed by JS */
+.team-member-section.glitch-active {
+  animation: pixelate-glitch-anim 0.75s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+@keyframes pixelate-glitch-anim {
+  0% {
+    filter: none;
+    transform: none;
+  }
+  5% {
+    filter: url(#pixel-glitch-heavy);
+    transform: skewX(-4deg) scale(1.02);
+  }
+  15% {
+    filter: url(#pixel-glitch-medium);
+    transform: skewX(3deg) scale(0.985);
+  }
+  25% {
+    filter: url(#pixel-glitch-heavy);
+    transform: skewX(-2deg) scale(1.01);
+  }
+  35% {
+    filter: url(#pixel-glitch-light);
+    transform: skewY(1deg) scale(0.995);
+  }
+  45% {
+    filter: url(#pixel-glitch-medium);
+    transform: skewX(2deg);
+  }
+  55% {
+    filter: url(#pixel-glitch-light);
+    transform: none;
+  }
+  65% {
+    filter: url(#pixel-glitch-medium);
+    transform: skewX(-1deg) scale(1.005);
+  }
+  75% {
+    filter: url(#pixel-glitch-light);
+    transform: none;
+  }
+  85% {
+    filter: none;
+    transform: none;
+  }
+  100% {
+    filter: none;
+    transform: none;
+  }
+}

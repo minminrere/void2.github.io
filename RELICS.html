@@ -184,6 +184,63 @@
     </div>
   </footer>
 
+  <!-- Glitch SVG Filters Definition -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <defs>
+      <!-- Heavy Pixelate Glitch -->
+      <filter id="pixel-glitch-heavy">
+        <feTurbulence type="fractalNoise" baseFrequency="0.08 0.95" numOctaves="1" result="noise" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="50" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+      <!-- Medium Pixelate Glitch -->
+      <filter id="pixel-glitch-medium">
+        <feTurbulence type="fractalNoise" baseFrequency="0.05 0.75" numOctaves="1" result="noise" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="25" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+      <!-- Light Pixelate Glitch -->
+      <filter id="pixel-glitch-light">
+        <feTurbulence type="fractalNoise" baseFrequency="0.02 0.45" numOctaves="1" result="noise" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="10" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </defs>
+  </svg>
+
   <script src="matrix-effect.js"></script>
+  <script>
+    // Intersection Observer for Scroll-in Pixelate Glitch effect on Team Member Sections
+    (() => {
+      const teamSections = document.querySelectorAll('.team-member-section');
+      if (!teamSections.length) return;
+
+      const observerOptions = {
+        root: null, // viewport
+        rootMargin: '0px',
+        threshold: 0.15 // trigger when 15% of the section is visible
+      };
+
+      const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const section = entry.target;
+            
+            // Add the dynamic scroll glitch class
+            section.classList.add('glitch-active');
+            
+            // Remove it after the animation completes (0.75s matches relics.css definition)
+            setTimeout(() => {
+              section.classList.remove('glitch-active');
+            }, 750);
+
+            // Once triggered on initial load, unobserve to optimize performance
+            observer.unobserve(section);
+          }
+        });
+      }, observerOptions);
+
+      teamSections.forEach(section => {
+        observer.observe(section);
+      });
+    })();
+  </script>
 </body>
 </html>
