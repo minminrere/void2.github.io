@@ -207,38 +207,147 @@
 
   <script src="matrix-effect.js"></script>
   <script>
-    // Intersection Observer for Scroll-in Pixelate Glitch effect on Team Member Sections
+    /**
+     * "Pixelate" Web Effect Component Engine
+     * Core Idea: Dynamically intercepts standard image elements, loads them onto an overlay canvas,
+     * and downsamples/upsamples the pixel grids in real-time. By drawing source imagery onto a tiny 
+     * resolution map and stretching it back with image smoothing completely disabled, we enforce
+     * retro, chunky hardware-pixelated mosaic distortions that resolve smoothly into clean grayscale focus.
+     */
     (() => {
-      const teamSections = document.querySelectorAll('.team-member-section');
-      if (!teamSections.length) return;
+      // Respect accessibility preferences: disable script if reduced motion is desired
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-      const observerOptions = {
-        root: null, // viewport
-        rootMargin: '0px',
-        threshold: 0.15 // trigger when 15% of the section is visible
-      };
+      const imageBoxes = document.querySelectorAll('.member-image-box');
+      if (!imageBoxes.length) return;
 
-      const observer = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const section = entry.target;
-            
-            // Add the dynamic scroll glitch class
-            section.classList.add('glitch-active');
-            
-            // Remove it after the animation completes (0.75s matches relics.css definition)
-            setTimeout(() => {
-              section.classList.remove('glitch-active');
-            }, 750);
+      // Tunable parameters
+      const DURATION = 2600; // range 1500..8000 (ms)
+      const MIN_SIZE = 1;    // range 1..6 (pixel size - 1 is fully resolved)
+      const MAX_SIZE = 36;   // range 8..60 (pixel size - chunky mosaic max)
 
-            // Once triggered on initial load, unobserve to optimize performance
-            observer.unobserve(section);
+      imageBoxes.forEach(box => {
+        const img = box.querySelector('.member-portrait');
+        if (!img) return;
+
+        // 1. Injected Overlay Canvas element
+        const canvas = document.createElement('canvas');
+        canvas.className = 'pixelate-canvas';
+        box.appendChild(canvas);
+        const ctx = canvas.getContext('2d');
+
+        let animationFrameId = null;
+        let startTime = null;
+        let isVisible = false;
+        let isRunning = false;
+
+        // Helper to maintain canvas dimensions relative to natural source resolution
+        const initCanvasSize = () => {
+          canvas.width = img.naturalWidth || img.clientWidth || 300;
+          canvas.height = img.naturalHeight || img.clientHeight || 450;
+        };
+
+        if (img.complete) {
+          initCanvasSize();
+        } else {
+          img.onload = initCanvasSize;
+        }
+
+        // 2. Downsample -> Upsample core algorithm
+        const renderPixelation = (progress) => {
+          if (!img.complete || img.naturalWidth === 0) return;
+
+          // Ease-out cubic curve for cinematic slow recovery near focus
+          const eased = 1 - Math.pow(1 - progress, 3);
+          
+          // Calculate current pixel cell dimension
+          const currentPixelSize = MAX_SIZE - (MAX_SIZE - MIN_SIZE) * eased;
+
+          const w = canvas.width;
+          const h = canvas.height;
+
+          if (currentPixelSize <= 1) {
+            // Draw pure raw source image
+            ctx.drawImage(img, 0, 0, w, h);
+            return;
+          }
+
+          // Downsample grid calculation
+          const sw = Math.max(1, Math.round(w / currentPixelSize));
+          const sh = Math.max(1, Math.round(h / currentPixelSize));
+
+          // Draw downscaled to offscreen buffer
+          const offscreen = document.createElement('canvas');
+          offscreen.width = sw;
+          offscreen.height = sh;
+          const offCtx = offscreen.getContext('2d');
+          offCtx.drawImage(img, 0, 0, sw, sh);
+
+          // Force chunky raw pixels (bypass cubic interpolation on upscaling)
+          ctx.imageSmoothingEnabled = false;
+          ctx.mozImageSmoothingEnabled = false;
+          ctx.webkitImageSmoothingEnabled = false;
+          ctx.msImageSmoothingEnabled = false;
+
+          // Upsample and map back to active canvas
+          ctx.clearRect(0, 0, w, h);
+          ctx.drawImage(offscreen, 0, 0, sw, sh, 0, 0, w, h);
+        };
+
+        // 3. RequestAnimationFrame Loop control
+        const animate = (timestamp) => {
+          if (!startTime) startTime = timestamp;
+          const elapsed = timestamp - startTime;
+          const progress = Math.min(1, elapsed / DURATION);
+
+          renderPixelation(progress);
+
+          if (progress < 1 && isVisible && isRunning) {
+            animationFrameId = requestAnimationFrame(animate);
+          } else {
+            // Remove visibility class once finished to reveal original image below
+            canvas.classList.remove('active');
+            isRunning = false;
+            animationFrameId = null;
+          }
+        };
+
+        const triggerGlitch = () => {
+          if (isRunning) {
+            cancelAnimationFrame(animationFrameId);
+          }
+          initCanvasSize();
+          startTime = null;
+          isRunning = true;
+          canvas.classList.add('active');
+          animationFrameId = requestAnimationFrame(animate);
+        };
+
+        // 4. Trigger on Mouse Hover
+        box.addEventListener('mouseenter', () => {
+          if (isVisible) {
+            triggerGlitch();
           }
         });
-      }, observerOptions);
 
-      teamSections.forEach(section => {
-        observer.observe(section);
+        // 5. Trigger on Scroll (Intersection Observer)
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            isVisible = entry.isIntersecting;
+            if (isVisible) {
+              triggerGlitch();
+            } else {
+              // Pause loop when off-screen to preserve performance
+              if (isRunning) {
+                cancelAnimationFrame(animationFrameId);
+                canvas.classList.remove('active');
+                isRunning = false;
+              }
+            }
+          });
+        }, { threshold: 0.15 });
+
+        observer.observe(box);
       });
     })();
   </script>
