@@ -344,15 +344,15 @@
         }
         
         let scaleProgress = 0;
-        if (progress < 0.4) {
-          // Expand phase
-          scaleProgress = progress / 0.4;
-        } else if (progress <= 0.6) {
+        if (progress < 0.7) {
+          // Expand phase (Very slow expansion spanning 70% of scroll)
+          scaleProgress = progress / 0.7;
+        } else if (progress <= 0.85) {
           // Full-screen focus phase
           scaleProgress = 1;
         } else {
           // Collapse phase
-          scaleProgress = 1 - (progress - 0.6) / 0.4;
+          scaleProgress = 1 - (progress - 0.85) / 0.15;
         }
         
         // Cubic ease-in-out curve

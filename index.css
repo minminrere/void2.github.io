@@ -578,7 +578,7 @@ section {
 /* 04.5 Gameplay Video Feed */
 .video-feed-section {
   position: relative;
-  height: 350vh; /* Increased scroll depth to slow down the transition speed */
+  height: 450vh; /* Extremely deep scroll track for a highly majestic, slow transition */
   padding: 0;
   margin: 0;
   background: var(--color-bg);
