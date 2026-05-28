@@ -371,3 +371,12 @@
     padding: 60px 32px;
   }
 }
+
+/* Typewriter Visual Integration */
+typewriter-text {
+  --typewriter-caret-color: #ff3333;
+}
+typewriter-text .typewriter-cursor {
+  box-shadow: 0 0 6px rgba(255, 51, 51, 0.8);
+}
+

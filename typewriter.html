@@ -1,0 +1,597 @@
+<!--
+  TypewriterText Component
+  
+  Core Idea:
+  This self-contained component implements a premium, highly accessible "Typewriter" effect in pure vanilla HTML, CSS, and JS.
+  It dynamically types out content one character at a time with a blinking terminal-style caret. 
+  By utilizing standard custom elements, it encapsulates behavior and style while fully adapting to parent text formatting.
+  Accessibility is prioritized: it provides screen readers with the full text instantly (using a visually hidden element)
+  and completely bypasses typing animations for users who prefer reduced motion. Additionally, an IntersectionObserver 
+  optimizes performance by automatically pausing heavy typing and blinking loops whenever the element is off-screen.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Typewriter Web Component - Interactive Demo</title>
+  
+  <!-- Sleek Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* Premium Monochrome Terminal CSS Variables */
+    :root {
+      --bg-color: #050505;
+      --panel-bg: rgba(18, 18, 18, 0.7);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --text-main: #e2e2e2;
+      --text-muted: #8e8e93;
+      --accent: #ffffff;
+      --accent-glow: rgba(255, 255, 255, 0.15);
+      
+      /* Typewriter Custom Properties */
+      --typewriter-caret-color: var(--accent);
+      --typewriter-caret-width: 2px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: 'JetBrains Mono', monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 50% 50%, rgba(20, 20, 20, 0.8) 0%, var(--bg-color) 100%),
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 30px 30px, 30px 30px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+      max-width: 600px;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 500;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+      display: inline-block;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* Main Grid Layout */
+    .container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 30px;
+      width: 100%;
+      max-width: 800px;
+    }
+
+    @media (min-width: 768px) {
+      .container {
+        grid-template-columns: 1.2fr 1fr;
+      }
+    }
+
+    /* Interactive Component Display */
+    .display-panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 40px;
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 280px;
+      position: relative;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .panel-tag {
+      position: absolute;
+      top: 16px;
+      left: 20px;
+      font-size: 10px;
+      color: var(--text-muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* Custom Element Container Styling */
+    .preview-text {
+      font-size: 18px;
+      line-height: 1.8;
+      color: var(--text-main);
+    }
+
+    /* Controls Panel */
+    .controls-panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 30px;
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    label span {
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 4px;
+      background: var(--border-color);
+      border-radius: 2px;
+      outline: none;
+      transition: background 0.3s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      box-shadow: 0 0 10px var(--accent-glow);
+      transition: transform 0.2s, background-color 0.2s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    .checkbox-group {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border-color);
+      padding-top: 20px;
+      margin-top: 10px;
+    }
+
+    .checkbox-label {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 22px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: var(--border-color);
+      transition: .3s;
+      border-radius: 34px;
+      border: 1px solid transparent;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      bottom: 3px;
+      background-color: var(--text-muted);
+      transition: .3s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-color: var(--border-color);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(22px);
+      background-color: var(--accent);
+      box-shadow: 0 0 8px var(--accent-glow);
+    }
+
+    /* Text Selection Actions */
+    .action-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      border-top: 1px solid var(--border-color);
+      padding-top: 20px;
+    }
+
+    .btn {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+
+    .btn:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-color: var(--text-main);
+    }
+
+    footer {
+      margin-top: 60px;
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    /* Custom Web Component CSS Styling Rules */
+    typewriter-text {
+      display: inline;
+      position: relative;
+    }
+
+    .typewriter-content {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .typewriter-cursor {
+      display: inline-block;
+      width: var(--typewriter-caret-width, 0.08em);
+      height: 1.1em;
+      background-color: var(--typewriter-caret-color, currentColor);
+      margin-left: 2px;
+      vertical-align: middle;
+      animation: typewriter-blink 1s steps(2, start) infinite;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @keyframes typewriter-blink {
+      0%, 100% { opacity: 0; }
+      50% { opacity: 1; }
+    }
+
+    /* Accessibility standard */
+    @media (prefers-reduced-motion: reduce) {
+      .typewriter-cursor {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Typewriter Component</h1>
+    <p class="subtitle">A highly performant, accessible custom element. Designed for modern web systems, built natively with HTML, CSS, and JavaScript.</p>
+  </header>
+
+  <div class="container">
+    <!-- Component Viewport -->
+    <div class="display-panel">
+      <div class="panel-tag">// LIVE PREVIEW</div>
+      <div class="preview-text">
+        <typewriter-text id="typewriter-demo" speed="90" pause="1400" loop="true">
+          Initializing core visual protocol. Calibrating user sensory atmosphere. Access granted to secure terminal. Typewriter sequence running smoothly.
+        </typewriter-text>
+      </div>
+    </div>
+
+    <!-- Live Customizer Dashboard -->
+    <div class="controls-panel">
+      <!-- Speed Slider -->
+      <div class="control-group">
+        <label for="speed-control">Speed (Char delay) <span id="speed-val">90 ms</span></label>
+        <input type="range" id="speed-control" min="30" max="250" step="5" value="90">
+      </div>
+
+      <!-- End Pause Slider -->
+      <div class="control-group">
+        <label for="pause-control">End Pause (Delay) <span id="pause-val">1400 ms</span></label>
+        <input type="range" id="pause-control" min="200" max="4000" step="50" value="1400">
+      </div>
+
+      <!-- Loop Checkbox Switch -->
+      <div class="control-group checkbox-group">
+        <label for="loop-control" class="checkbox-label">Loop Typing Effect</label>
+        <label class="switch">
+          <input type="checkbox" id="loop-control" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <!-- Actions / Presets -->
+      <div class="action-group">
+        <button class="btn" id="preset-description">Switch to Description Text</button>
+        <button class="btn" id="preset-name">Switch to Short Name</button>
+        <button class="btn" id="trigger-reset">Trigger Hard Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    PREMIUM WEB COMPONENT SPECIFICATION — VER 1.0.0
+  </footer>
+
+  <!-- Web Component JS Logic -->
+  <script>
+    class TypewriterText extends HTMLElement {
+      static get observedAttributes() {
+        return ['speed', 'pause', 'loop'];
+      }
+
+      constructor() {
+        super();
+        this.originalText = '';
+        this.charIndex = 0;
+        this.typingTimeout = null;
+        this.isIntersecting = false;
+        this.isDeleting = false;
+        
+        this.handleIntersection = this.handleIntersection.bind(this);
+        this.tick = this.tick.bind(this);
+      }
+
+      connectedCallback() {
+        this.initializeContent();
+        
+        // Setup IntersectionObserver to avoid rendering loops when offscreen
+        this.observer = new IntersectionObserver(this.handleIntersection, {
+          threshold: 0.05
+        });
+        this.observer.observe(this);
+        
+        // Accessibility Listener for OS-level preferences
+        this.reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+        this.handleMotionPreference();
+        this.reducedMotionQuery.addEventListener('change', () => this.handleMotionPreference());
+      }
+
+      disconnectedCallback() {
+        if (this.observer) this.observer.disconnect();
+        if (this.typingTimeout) clearTimeout(this.typingTimeout);
+      }
+
+      attributeChangedCallback(name, oldValue, newValue) {
+        if (oldValue === newValue) return;
+        if (this.originalText) {
+          this.resetAnimation();
+        }
+      }
+
+      initializeContent() {
+        if (!this.originalText) {
+          // Normalize internal text content by stripping extra whitespaces
+          this.originalText = this.textContent.trim().replace(/\s+/g, ' ');
+        }
+        
+        // Strict Accessibility: Use screen-reader visible layer that remains static and 
+        // a secondary dynamic layer decorated with aria-hidden to prevent assistive spam
+        this.innerHTML = `
+          <span class="sr-only">${this.originalText}</span>
+          <span class="typewriter-visible" aria-hidden="true">
+            <span class="typewriter-content"></span><span class="typewriter-cursor"></span>
+          </span>
+        `;
+        
+        this.visibleSpan = this.querySelector('.typewriter-content');
+        this.cursorSpan = this.querySelector('.typewriter-cursor');
+      }
+
+      get speed() {
+        const val = parseInt(this.getAttribute('speed'));
+        return isNaN(val) ? 90 : Math.max(30, Math.min(250, val));
+      }
+
+      get pause() {
+        const val = parseInt(this.getAttribute('pause'));
+        return isNaN(val) ? 1400 : Math.max(200, Math.min(4000, val));
+      }
+
+      get loop() {
+        return this.getAttribute('loop') === 'true';
+      }
+
+      handleIntersection(entries) {
+        entries.forEach(entry => {
+          this.isIntersecting = entry.isIntersecting;
+          if (this.isIntersecting) {
+            this.resumeAnimation();
+          } else {
+            this.pauseAnimation();
+          }
+        });
+      }
+
+      handleMotionPreference() {
+        if (this.reducedMotionQuery.matches) {
+          this.pauseAnimation();
+          if (this.visibleSpan) this.visibleSpan.textContent = this.originalText;
+          if (this.cursorSpan) this.cursorSpan.style.display = 'none';
+        } else {
+          if (this.cursorSpan) this.cursorSpan.style.display = '';
+          this.resetAnimation();
+        }
+      }
+
+      resetAnimation() {
+        this.pauseAnimation();
+        this.charIndex = 0;
+        this.isDeleting = false;
+        if (this.visibleSpan) this.visibleSpan.textContent = '';
+        if (this.isIntersecting && !this.reducedMotionQuery.matches) {
+          this.tick();
+        }
+      }
+
+      pauseAnimation() {
+        if (this.typingTimeout) {
+          clearTimeout(this.typingTimeout);
+          this.typingTimeout = null;
+        }
+      }
+
+      resumeAnimation() {
+        if (this.reducedMotionQuery.matches) return;
+        if (!this.typingTimeout && this.isIntersecting) {
+          this.tick();
+        }
+      }
+
+      // Update text data dynamically
+      updateText(newText) {
+        this.originalText = newText;
+        this.resetAnimation();
+        this.initializeContent();
+        this.resetAnimation();
+      }
+
+      tick() {
+        if (!this.isIntersecting || this.reducedMotionQuery.matches) return;
+        
+        const text = this.originalText;
+        
+        if (!this.isDeleting) {
+          // Typing forwards
+          if (this.charIndex < text.length) {
+            this.charIndex++;
+            this.visibleSpan.textContent = text.substring(0, this.charIndex);
+            this.typingTimeout = setTimeout(this.tick, this.speed);
+          } else {
+            // Typing complete
+            if (this.loop) {
+              this.typingTimeout = setTimeout(() => {
+                this.isDeleting = true;
+                this.tick();
+              }, this.pause);
+            }
+          }
+        } else {
+          // Deleting backwards (2x speed for satisfying UX)
+          if (this.charIndex > 0) {
+            this.charIndex--;
+            this.visibleSpan.textContent = text.substring(0, this.charIndex);
+            this.typingTimeout = setTimeout(this.tick, this.speed / 2);
+          } else {
+            // Deletion complete
+            this.isDeleting = false;
+            this.typingTimeout = setTimeout(this.tick, this.speed);
+          }
+        }
+      }
+    }
+
+    customElements.define('typewriter-text', TypewriterText);
+
+    // Dynamic Live Panel Control Scripts
+    const demoEl = document.getElementById('typewriter-demo');
+    const speedCtrl = document.getElementById('speed-control');
+    const speedVal = document.getElementById('speed-val');
+    const pauseCtrl = document.getElementById('pause-control');
+    const pauseVal = document.getElementById('pause-val');
+    const loopCtrl = document.getElementById('loop-control');
+
+    speedCtrl.addEventListener('input', (e) => {
+      const val = e.target.value;
+      speedVal.textContent = `${val} ms`;
+      demoEl.setAttribute('speed', val);
+    });
+
+    pauseCtrl.addEventListener('input', (e) => {
+      const val = e.target.value;
+      pauseVal.textContent = `${val} ms`;
+      demoEl.setAttribute('pause', val);
+    });
+
+    loopCtrl.addEventListener('change', (e) => {
+      demoEl.setAttribute('loop', e.target.checked ? 'true' : 'false');
+    });
+
+    document.getElementById('preset-description').addEventListener('click', () => {
+      demoEl.updateText('Initializing core visual protocol. Calibrating user sensory atmosphere. Access granted to secure terminal. Typewriter sequence running smoothly.');
+    });
+
+    document.getElementById('preset-name').addEventListener('click', () => {
+      demoEl.updateText('Park Eun-sol');
+    });
+
+    document.getElementById('trigger-reset').addEventListener('click', () => {
+      demoEl.resetAnimation();
+    });
+  </script>
+</body>
+</html>
