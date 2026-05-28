@@ -2,8 +2,8 @@
 const matrixLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
 
 document.addEventListener('DOMContentLoaded', () => {
-  // 1. Hover Scramble Effect for Links and Buttons
-  const interactElements = document.querySelectorAll('.nav-link, .nav-button, .btn-primary, .btn-secondary, .footer-link, .hero-title, .team-title');
+  // 1. Hover Scramble Effect for Links and Buttons (excluding .team-title for custom scramble)
+  const interactElements = document.querySelectorAll('.nav-link, .nav-button, .btn-primary, .btn-secondary, .footer-link, .hero-title');
   
   interactElements.forEach(el => {
     el.addEventListener('mouseover', event => {
@@ -37,6 +37,37 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 30);
     });
   });
+
+  // 1b. Custom Team Title Scramble Transition (TEAM -> VOID on hover)
+  const teamTitle = document.querySelector('.team-title');
+  if (teamTitle) {
+    const scrambleTo = (targetText) => {
+      let iterations = 0;
+      clearInterval(teamTitle.matrixInterval);
+      
+      teamTitle.matrixInterval = setInterval(() => {
+        teamTitle.innerText = targetText.split("")
+          .map((letter, index) => {
+            if (letter === ' ' || letter === '\n') return letter;
+            if (index < iterations) {
+              return targetText[index];
+            }
+            return matrixLetters[Math.floor(Math.random() * matrixLetters.length)];
+          })
+          .join("");
+        
+        if (iterations >= targetText.length) {
+          clearInterval(teamTitle.matrixInterval);
+          teamTitle.innerText = targetText;
+        }
+        
+        iterations += 1 / 3; // speed of scramble reveal
+      }, 30);
+    };
+
+    teamTitle.addEventListener('mouseenter', () => scrambleTo("VOID"));
+    teamTitle.addEventListener('mouseleave', () => scrambleTo("TEAM"));
+  }
 
   // 2. Global Interactive Matrix Rain Background
   if (true) { // Enabled globally across all pages, including RELICS.html
