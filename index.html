@@ -371,18 +371,9 @@
         }
         const initialHeight = initialWidth / ratio;
 
-        // Calculate maximum target size that fits in viewport preserving 16:9
-        let targetWidth, targetHeight;
-        const viewportRatio = window.innerWidth / window.innerHeight;
-        if (viewportRatio > ratio) {
-          // Viewport is wider than 16:9 (Pillarbox/cinematic layout)
-          targetHeight = window.innerHeight;
-          targetWidth = window.innerHeight * ratio;
-        } else {
-          // Viewport is taller than 16:9 (Letterbox layout, standard on mobile)
-          targetWidth = window.innerWidth;
-          targetHeight = window.innerWidth / ratio;
-        }
+        // Target is the entire viewport (monitor screen) size to fill it completely
+        const targetWidth = window.innerWidth;
+        const targetHeight = window.innerHeight;
 
         const currentWidth = initialWidth + (targetWidth - initialWidth) * easedProgress;
         const currentHeight = initialHeight + (targetHeight - initialHeight) * easedProgress;
