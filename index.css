@@ -624,6 +624,22 @@ section {
   object-fit: fill; /* Stretches the video to fill the viewport completely without cropping */
 }
 
+.glitch-overlay {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(150, 7, 3, 0.25) 0px,
+    rgba(150, 7, 3, 0.25) 2px,
+    transparent 2px,
+    transparent 4px
+  );
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: color-burn;
+  z-index: 2;
+}
+
 .video-gradient {
   position: absolute;
   inset: 0;

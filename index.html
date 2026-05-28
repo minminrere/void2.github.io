@@ -159,6 +159,7 @@
         <div class="video-feed opacity-50">
           <video src="assets/ingame.mp4" autoplay loop muted playsinline></video>
         </div>
+        <div class="glitch-overlay"></div>
         <div class="video-gradient"></div>
         
         <div class="video-top-left-info">
@@ -312,7 +313,7 @@
       setInterval(drawMatrix, 40);
     }
 
-    // Video Expand on Scroll Effect
+    // Video Expand on Scroll Effect with Glitch Distortion
     (() => {
       const videoSection = document.getElementById('video');
       if (!videoSection) return;
@@ -320,6 +321,7 @@
       const videoStickyWrapper = videoSection.querySelector('.video-sticky-wrapper');
       const videoContainer = videoSection.querySelector('.video-container');
       const videoFeed = videoSection.querySelector('.video-feed');
+      const glitchOverlay = videoSection.querySelector('.glitch-overlay');
       if (!videoStickyWrapper || !videoContainer || !videoFeed) return;
 
       const handleScroll = () => {
@@ -342,6 +344,9 @@
           videoContainer.style.maxWidth = '';
           videoContainer.style.aspectRatio = '';
           videoFeed.style.opacity = '';
+          videoFeed.style.transform = '';
+          videoFeed.style.filter = '';
+          if (glitchOverlay) glitchOverlay.style.opacity = '';
           videoStickyWrapper.style.zIndex = '';
           return;
         }
@@ -395,6 +400,34 @@
         videoContainer.style.borderRadius = `${currentRadius}px`;
         videoContainer.style.borderColor = `rgba(68, 71, 72, ${borderAlpha})`;
         videoFeed.style.opacity = currentVideoOpacity;
+
+        // --- GLITCH EFFECT ON SIZE CHANGE ---
+        // Active when size is dynamically transforming (easedProgress is between 0.02 and 0.98)
+        const isGlitching = easedProgress > 0.02 && easedProgress < 0.98;
+        if (isGlitching) {
+          // Calculate high-fidelity, high-speed random glitch metrics
+          const randomSkew = (Math.random() - 0.5) * 6; // -3deg ~ 3deg skew horizontal
+          const randomTranslateX = (Math.random() - 0.5) * 16; // -8px ~ 8px jitter horizontal
+          const randomTranslateY = (Math.random() - 0.5) * 8;  // -4px ~ 4px jitter vertical
+          const randomScale = 1.0 + Math.random() * 0.03;      // Subtle expansion shockwave
+          const randomHue = Math.random() * 20;               // Chromatic aberration shift (0~20deg)
+          const randomContrast = 100 + Math.random() * 120;     // Flash distortion (100% ~ 220%)
+          const randomSaturate = 100 + Math.random() * 150;     // Saturation spikes
+          
+          // Apply hardware-accelerated transform & dynamic filters to the video
+          videoFeed.style.transform = `scale(${randomScale}) skewX(${randomSkew}deg) translate3d(${randomTranslateX}px, ${randomTranslateY}px, 0)`;
+          videoFeed.style.filter = `hue-rotate(${randomHue}deg) contrast(${randomContrast}%) saturate(${randomSaturate}%)`;
+          
+          // Trigger scans and red tint glitch flashes
+          if (glitchOverlay) {
+            glitchOverlay.style.opacity = (0.15 + Math.random() * 0.5).toString();
+          }
+        } else {
+          // Fully resolved state: wipe out all distortions and clean up filters
+          videoFeed.style.transform = '';
+          videoFeed.style.filter = '';
+          if (glitchOverlay) glitchOverlay.style.opacity = '0';
+        }
         
         // Cover navigation bar (z-index: 100) when expanding or expanded
         if (easedProgress > 0.05) {
