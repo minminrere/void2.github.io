@@ -224,7 +224,7 @@
       // Tunable parameters
       const DURATION = 2600; // range 1500..8000 (ms)
       const MIN_SIZE = 1;    // range 1..6 (pixel size - 1 is fully resolved)
-      const MAX_SIZE = 36;   // range 8..60 (pixel size - chunky mosaic max)
+      const MAX_SIZE = 16;   // range 8..60 (decreased from 36 to 16 to lower effect intensity)
 
       imageBoxes.forEach(box => {
         const img = box.querySelector('.member-portrait');
@@ -253,7 +253,7 @@
           img.onload = initCanvasSize;
         }
 
-        // 2. Downsample -> Upsample core algorithm
+        // 2. Downsample -> Upsample core algorithm with Neon Red & Neon Green splits
         const renderPixelation = (progress) => {
           if (!img.complete || img.naturalWidth === 0) return;
 
@@ -266,8 +266,10 @@
           const w = canvas.width;
           const h = canvas.height;
 
-          if (currentPixelSize <= 1) {
-            // Draw pure raw source image
+          ctx.clearRect(0, 0, w, h);
+
+          if (currentPixelSize <= 1.05) {
+            // Draw pure raw source image when resolved
             ctx.drawImage(img, 0, 0, w, h);
             return;
           }
@@ -283,15 +285,44 @@
           const offCtx = offscreen.getContext('2d');
           offCtx.drawImage(img, 0, 0, sw, sh);
 
+          // Create Neon Red channel buffer (source-in fills only active alpha pixels)
+          const redCanvas = document.createElement('canvas');
+          redCanvas.width = sw;
+          redCanvas.height = sh;
+          const redCtx = redCanvas.getContext('2d');
+          redCtx.drawImage(offscreen, 0, 0);
+          redCtx.globalCompositeOperation = 'source-in';
+          redCtx.fillStyle = 'rgba(255, 0, 68, 0.9)'; // Neon Red
+          redCtx.fillRect(0, 0, sw, sh);
+
+          // Create Neon Green channel buffer
+          const greenCanvas = document.createElement('canvas');
+          greenCanvas.width = sw;
+          greenCanvas.height = sh;
+          const greenCtx = greenCanvas.getContext('2d');
+          greenCtx.drawImage(offscreen, 0, 0);
+          greenCtx.globalCompositeOperation = 'source-in';
+          greenCtx.fillStyle = 'rgba(0, 255, 102, 0.9)'; // Neon Green
+          greenCtx.fillRect(0, 0, sw, sh);
+
           // Force chunky raw pixels (bypass cubic interpolation on upscaling)
           ctx.imageSmoothingEnabled = false;
           ctx.mozImageSmoothingEnabled = false;
           ctx.webkitImageSmoothingEnabled = false;
           ctx.msImageSmoothingEnabled = false;
 
-          // Upsample and map back to active canvas
-          ctx.clearRect(0, 0, w, h);
-          ctx.drawImage(offscreen, 0, 0, sw, sh, 0, 0, w, h);
+          // Subtle offset calculated dynamically (lowered intensity offset)
+          const offset = Math.max(1, currentPixelSize * 0.15);
+
+          // Draw Neon Red channel slightly shifted left
+          ctx.drawImage(redCanvas, 0, 0, sw, sh, -offset, 0, w, h);
+
+          // Composite Neon Green shifted right with screen blending
+          ctx.globalCompositeOperation = 'screen';
+          ctx.drawImage(greenCanvas, 0, 0, sw, sh, offset, 0, w, h);
+
+          // Restore normal composition blending
+          ctx.globalCompositeOperation = 'source-over';
         };
 
         // 3. RequestAnimationFrame Loop control
