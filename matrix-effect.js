@@ -3,7 +3,7 @@ const matrixLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
 
 document.addEventListener('DOMContentLoaded', () => {
   // 1. Hover Scramble Effect for Links and Buttons
-  const interactElements = document.querySelectorAll('.nav-link, .nav-button, .btn-primary, .btn-secondary, .footer-link, .hero-title');
+  const interactElements = document.querySelectorAll('.nav-link, .nav-button, .btn-primary, .btn-secondary, .footer-link, .hero-title, .team-title');
   
   interactElements.forEach(el => {
     el.addEventListener('mouseover', event => {
@@ -39,6 +39,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // 2. Global Interactive Matrix Rain Background
+  if (document.body.classList.contains('relics-body')) {
+    return;
+  }
   const globalCanvas = document.createElement('canvas');
   globalCanvas.id = 'global-matrix-bg';
   Object.assign(globalCanvas.style, {
