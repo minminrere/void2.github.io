@@ -332,22 +332,26 @@
         
         const progress = -rect.top / totalScroll;
         
-        // If we are completely outside the sticky scroll range, clear inline styles
-        // Allow slightly more margin to prevent abrupt jumps during high-speed scrolls
-        if (progress <= -0.15 || progress >= 1.15) {
+        // If we are completely outside the active scroll range, clear inline styles
+        // Bounds are set to [-0.25, 1.15] to safely contain the transition range [-0.2, 0.7]
+        if (progress <= -0.25 || progress >= 1.15) {
           videoContainer.style.width = '';
           videoContainer.style.height = '';
           videoContainer.style.borderRadius = '';
           videoContainer.style.borderColor = '';
+          videoContainer.style.maxWidth = '';
           videoFeed.style.opacity = '';
           videoStickyWrapper.style.zIndex = '';
           return;
         }
         
         let scaleProgress = 0;
-        if (progress <= 0) {
-          // Fully expanded when starting or before entering the sticky zone
-          scaleProgress = 1;
+        if (progress <= -0.2) {
+          // Fully minimized at original card layout
+          scaleProgress = 0;
+        } else if (progress <= 0) {
+          // Smoothly scale up from 0 to 1 as we approach the sticky start point (progress = 0)
+          scaleProgress = (progress + 0.2) / 0.2;
         } else if (progress <= 0.7) {
           // Gradually shrink to original card size as we scroll down to 70% of the track
           scaleProgress = 1 - (progress / 0.7);
@@ -385,6 +389,7 @@
         // Update styles
         videoContainer.style.width = `${currentWidth}px`;
         videoContainer.style.height = `${currentHeight}px`;
+        videoContainer.style.maxWidth = easedProgress > 0 ? 'none' : '';
         videoContainer.style.borderRadius = `${currentRadius}px`;
         videoContainer.style.borderColor = `rgba(68, 71, 72, ${borderAlpha})`;
         videoFeed.style.opacity = currentVideoOpacity;
