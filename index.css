@@ -882,4 +882,15 @@ section {
   .nav-links {
     display: none; /* simple mobile hide for now */
   }
+  .video-container {
+    width: calc(100% - 64px);
+    height: 350px;
+  }
+}
+
+@media (max-width: 768px) {
+  .video-container {
+    width: calc(100% - 32px);
+    height: 250px;
+  }
 }

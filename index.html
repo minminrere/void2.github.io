@@ -358,12 +358,22 @@
         // Cubic ease-in-out curve
         const easedProgress = scaleProgress * scaleProgress * (3 - 2 * scaleProgress);
         
-        // Interpolate values
-        const initialWidth = window.innerWidth <= 1024 ? window.innerWidth - 64 : Math.min(1152, window.innerWidth - 128);
+        // Interpolate values matching CSS media queries exactly
+        let initialWidth, initialHeight;
+        if (window.innerWidth <= 768) {
+          initialWidth = window.innerWidth - 32;
+          initialHeight = 250;
+        } else if (window.innerWidth <= 1024) {
+          initialWidth = window.innerWidth - 64;
+          initialHeight = 350;
+        } else {
+          initialWidth = Math.min(1152, window.innerWidth - 128);
+          initialHeight = 646;
+        }
+
         const targetWidth = window.innerWidth;
         const currentWidth = initialWidth + (targetWidth - initialWidth) * easedProgress;
         
-        const initialHeight = window.innerWidth <= 1024 ? 350 : 646;
         const targetHeight = window.innerHeight;
         const currentHeight = initialHeight + (targetHeight - initialHeight) * easedProgress;
         
