@@ -3,7 +3,7 @@ const matrixLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
 
 document.addEventListener('DOMContentLoaded', () => {
   // 1. Hover Scramble Effect for Links and Buttons (excluding .team-title for custom scramble)
-  const interactElements = document.querySelectorAll('.nav-link, .nav-button, .btn-primary, .btn-secondary, .footer-link, .hero-title');
+  const interactElements = document.querySelectorAll('.nav-link, .nav-links a, .nav-button, .btn-primary, .btn-secondary, .footer-link, .hero-title, .protocol-btn, .cta-btn');
   
   interactElements.forEach(el => {
     el.addEventListener('mouseover', event => {
@@ -257,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const addHoverListeners = () => {
-    const interactive = document.querySelectorAll('a, button, [role="button"], .platform-btn, .tag, .submit-btn, .play-icon-box');
+    const interactive = document.querySelectorAll('a, button, [role="button"], .platform-btn, .tag, .submit-btn, .play-icon-box, .feed-item');
     interactive.forEach(el => {
       el.addEventListener('mouseenter', () => updateHoverState(true));
       el.addEventListener('mouseleave', () => updateHoverState(false));
