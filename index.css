@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
 :root {
   --color-bg: #000000;
   --color-bg-alt: #0d0e0f;
@@ -7,9 +9,9 @@
   --color-border: rgba(68, 71, 72, 0.3);
   --color-border-subtle: rgba(68, 71, 72, 0.2);
   
-  --font-serif: 'Bodoni Moda', serif;
-  --font-mono: 'JetBrains Mono', monospace;
-  --font-sans: 'Noto Sans KR', sans-serif; /* For KR texts like WenQuanYi */
+  --font-serif: 'Inter', sans-serif;
+  --font-mono: 'Inter', sans-serif;
+  --font-sans: 'Inter', 'Noto Sans KR', sans-serif; /* For KR texts like Noto Sans KR */
 }
 
 html {
