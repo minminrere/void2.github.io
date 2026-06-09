@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 1b. Custom Team Title Scramble Transition (TEAM -> VOID on hover)
+  // 1b. Custom Team Title Scramble Transition (TEAM -> D3B3 on hover)
   const teamTitle = document.querySelector('.team-title');
   if (teamTitle) {
     const scrambleTo = (targetText) => {
@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 30);
     };
 
-    teamTitle.addEventListener('mouseenter', () => scrambleTo("VOID"));
+    teamTitle.addEventListener('mouseenter', () => scrambleTo("D3B3"));
     teamTitle.addEventListener('mouseleave', () => scrambleTo("TEAM"));
   }
 
