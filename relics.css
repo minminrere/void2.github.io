@@ -420,8 +420,12 @@ typewriter-text .typewriter-cursor {
 }
 
 .values-image-box:hover .values-image {
-  filter: grayscale(20%) contrast(110%);
+  filter: grayscale(0%) contrast(110%);
   transform: scale(1.03);
+}
+
+.values-image-box:hover .blend-saturation {
+  opacity: 0;
 }
 
 .values-sys-info {
