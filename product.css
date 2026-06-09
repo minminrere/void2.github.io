@@ -2229,7 +2229,7 @@ section {
 }
 
 .system-content-col {
-  flex: 1;
+  flex: 1.2;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -2268,7 +2268,7 @@ section {
 }
 
 .system-media-col {
-  flex: 1;
+  flex: 0.8;
   height: 480px;
   overflow: hidden;
   position: relative;
@@ -2309,10 +2309,12 @@ section {
   .system-media-col {
     width: 100%;
     height: 300px;
+    flex: none;
   }
   .system-content-col {
     width: 100%;
     padding: 32px 20px;
+    flex: none;
   }
   .system-feature-name {
     font-size: 20px;
