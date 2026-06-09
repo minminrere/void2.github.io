@@ -574,17 +574,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // 8. Character Selection Tabs
-  const charTabs = document.querySelectorAll('.char-tab');
+  // 8. Character Selection Pagination (Zelda Style Layout)
+  const charDots = document.querySelectorAll('.char-dot');
   const charSlides = document.querySelectorAll('.character-slide');
 
-  charTabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      const index = parseInt(tab.getAttribute('data-char-index'));
+  charDots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      const index = parseInt(dot.getAttribute('data-char-index'));
       
-      // Update active tab
-      charTabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
+      // Update active dot
+      charDots.forEach(d => d.classList.remove('active'));
+      dot.classList.add('active');
 
       // Update active slide
       charSlides.forEach(slide => {

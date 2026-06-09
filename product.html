@@ -279,102 +279,88 @@
 
     <!-- Section 5: Characters -->
     <section id="characters" class="section-characters reveal">
-      <div class="container characters-header">
-        <div class="characters-tag">SUBJECT ARCHIVES</div>
-        <h2 class="characters-title">SYSTEM SUBJECTS</h2>
-        <div class="characters-subtitle">
-          "VOID 시스템 내부에서 감지된 비정상 데이터 개체 프로필"
-        </div>
+      <!-- Decorative horizontal lines behind the text -->
+      <div class="char-decoration-lines"></div>
+
+      <!-- Character Slides -->
+      <div class="characters-slider-wrap">
         
-        <!-- Tabs for character selection -->
-        <div class="characters-tabs">
-          <button class="char-tab active" data-char-index="0">[ SUB_01: MAN ]</button>
-          <button class="char-tab" data-char-index="1">[ SUB_02: LUNA ]</button>
-          <button class="char-tab" data-char-index="2">[ SUB_03: GHOST ]</button>
-        </div>
-      </div>
-      
-      <div class="container characters-container">
         <!-- Character 1: Man -->
-        <article class="character-slide active" data-slide-index="0">
-          <div class="char-slide-inner">
-            <div class="character-img-wrap">
-              <img src="assets/man.png" alt="Subject: Man" class="character-img">
-              <div class="character-img-glitch"></div>
-            </div>
-            <div class="character-info">
-              <span class="char-id">SUB_01 // ACTIVE_LOG</span>
-              <h3 class="char-name">MAN</h3>
-              <p class="char-desc">
-                가상 낙원의 오류를 최초로 발견한 기록되지 않은 플레이어. 시스템의 통제를 벗어나 현실로 탈출하기 위한 길을 찾고 있다.
-              </p>
-              <div class="char-stats">
-                <div class="stat-row">
-                  <span class="stat-lbl">THREAT LEVEL</span>
-                  <span class="stat-val warning">MODERATE</span>
-                </div>
-                <div class="stat-row">
-                  <span class="stat-lbl">STATUS</span>
-                  <span class="stat-val warning">UNTRACKED</span>
-                </div>
+        <div class="character-slide active" data-slide-index="0" style="background-image: url('assets/man.png');">
+          <div class="char-slide-overlay"></div>
+          <div class="container char-container">
+            <div class="char-content">
+              <div class="char-meta">SUBJECT FILE // SUB_01</div>
+              <div class="char-title-row">
+                <h3 class="char-name">MAN</h3>
+                <span class="char-subtitle">기억을 잃은 탈출자</span>
+              </div>
+              <div class="char-desc-block">
+                <p>가상 낙원의 오류를 최초로 발견하고 탈출을 시도하는 청년.</p>
+                <p>세상의 뒤편에 숨겨진 차가운 진실에 다가갈수록</p>
+                <p>낙원은 플레이어를 지우기 위해 가장 파괴적인 시스템을 가동한다.</p>
+              </div>
+              <div class="char-specs">
+                <span class="char-spec-item">STATUS: UNTRACKED</span>
+                <span class="char-spec-item">THREAT LEVEL: MODERATE</span>
               </div>
             </div>
           </div>
-        </article>
+        </div>
 
         <!-- Character 2: Luna -->
-        <article class="character-slide" data-slide-index="1">
-          <div class="char-slide-inner">
-            <div class="character-img-wrap">
-              <img src="assets/luna.png" alt="Subject: Luna" class="character-img">
-              <div class="character-img-glitch"></div>
-            </div>
-            <div class="character-info">
-              <span class="char-id">SUB_02 // SYSTEM_COMPLIANT</span>
-              <h3 class="char-name">LUNA</h3>
-              <p class="char-desc">
-                시스템의 지시에 충실히 순응하는 가상 낙원의 주민. 하지만 플레이어가 세계를 의심하게 만들며, 가장 예측할 수 없는 조력자이자 방해꾼이 된다.
-              </p>
-              <div class="char-stats">
-                <div class="stat-row">
-                  <span class="stat-lbl">THREAT LEVEL</span>
-                  <span class="stat-val">UNKNOWN</span>
-                </div>
-                <div class="stat-row">
-                  <span class="stat-lbl">STATUS</span>
-                  <span class="stat-val safe">MONITORED</span>
-                </div>
+        <div class="character-slide" data-slide-index="1" style="background-image: url('assets/luna.png');">
+          <div class="char-slide-overlay"></div>
+          <div class="container char-container">
+            <div class="char-content">
+              <div class="char-meta">SUBJECT FILE // SUB_02</div>
+              <div class="char-title-row">
+                <h3 class="char-name">LUNA</h3>
+                <span class="char-subtitle">낙원의 순응자</span>
+              </div>
+              <div class="char-desc-block">
+                <p>시스템의 규칙에 완벽히 길들여진 낙원의 주민.</p>
+                <p>플레이어에게 거짓된 안전을 가르치고 동요를 차단하지만,</p>
+                <p>그녀의 깊은 무의식 또한 시스템의 뒤틀린 진실을 감지하고 있다.</p>
+              </div>
+              <div class="char-specs">
+                <span class="char-spec-item">STATUS: MONITORED</span>
+                <span class="char-spec-item">THREAT LEVEL: UNKNOWN</span>
               </div>
             </div>
           </div>
-        </article>
+        </div>
 
         <!-- Character 3: Ghost -->
-        <article class="character-slide" data-slide-index="2">
-          <div class="char-slide-inner">
-            <div class="character-img-wrap">
-              <img src="assets/ghost.png" alt="Subject: Ghost" class="character-img">
-              <div class="character-img-glitch"></div>
-            </div>
-            <div class="character-info">
-              <span class="char-id">SUB_03 // MALWARE_DETECTED</span>
-              <h3 class="char-name">GHOST</h3>
-              <p class="char-desc">
-                붕괴하는 낙원의 어둠 속에서 나타나는 의문의 형체. 플레이어를 끊임없이 감시하고 위협하며, 세계 전체가 작동하는 공포의 시스템 그 자체를 상징한다.
-              </p>
-              <div class="char-stats">
-                <div class="stat-row">
-                  <span class="stat-lbl">THREAT LEVEL</span>
-                  <span class="stat-val danger">CRITICAL</span>
-                </div>
-                <div class="stat-row">
-                  <span class="stat-lbl">STATUS</span>
-                  <span class="stat-val danger">HOSTILE</span>
-                </div>
+        <div class="character-slide" data-slide-index="2" style="background-image: url('assets/ghost.png');">
+          <div class="char-slide-overlay"></div>
+          <div class="container char-container">
+            <div class="char-content">
+              <div class="char-meta">SUBJECT FILE // SUB_03</div>
+              <div class="char-title-row">
+                <h3 class="char-name">GHOST</h3>
+                <span class="char-subtitle">낙원의 감시자</span>
+              </div>
+              <div class="char-desc-block">
+                <p>붕괴하는 낙원의 균열 속에서 출현하는 적대적 개체.</p>
+                <p>플레이어의 한 걸음 한 걸음을 소리 없이 뒤쫓으며,</p>
+                <p>현실로 향하는 모든 통로를 물리적으로 분쇄하려 든다.</p>
+              </div>
+              <div class="char-specs">
+                <span class="char-spec-item">STATUS: HOSTILE</span>
+                <span class="char-spec-item">THREAT LEVEL: CRITICAL</span>
               </div>
             </div>
           </div>
-        </article>
+        </div>
+
+      </div>
+
+      <!-- Pagination Indicators (Diamond shape, right side) -->
+      <div class="char-pagination">
+        <button class="char-dot active" data-char-index="0" aria-label="Man profile"></button>
+        <button class="char-dot" data-char-index="1" aria-label="Luna profile"></button>
+        <button class="char-dot" data-char-index="2" aria-label="Ghost profile"></button>
       </div>
     </section>
 
