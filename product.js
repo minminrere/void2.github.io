@@ -234,6 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const demoBtn = document.getElementById('btn-demo');
 
   const triggerGlow = (btn) => {
+    if (!btn) return;
     btn.style.borderColor = 'var(--color-accent)';
     btn.style.boxShadow = '0 0 25px rgba(150, 7, 3, 0.6)';
     setTimeout(() => {
@@ -242,27 +243,35 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 1500);
   };
 
-  wishlistBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    triggerGlow(wishlistBtn);
-    const span = wishlistBtn.querySelector('span');
-    const originalText = span.textContent;
-    span.textContent = 'WISHLISTED_';
-    setTimeout(() => {
-      span.textContent = originalText;
-    }, 2000);
-  });
+  if (wishlistBtn) {
+    wishlistBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      triggerGlow(wishlistBtn);
+      const span = wishlistBtn.querySelector('span');
+      if (span) {
+        const originalText = span.textContent;
+        span.textContent = 'WISHLISTED_';
+        setTimeout(() => {
+          span.textContent = originalText;
+        }, 2000);
+      }
+    });
+  }
 
-  demoBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    triggerGlow(demoBtn);
-    const span = demoBtn.querySelector('span');
-    const originalText = span.textContent;
-    span.textContent = 'DOWNLOADING DEMO...';
-    setTimeout(() => {
-      span.textContent = originalText;
-    }, 2500);
-  });
+  if (demoBtn) {
+    demoBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      triggerGlow(demoBtn);
+      const span = demoBtn.querySelector('span');
+      if (span) {
+        const originalText = span.textContent;
+        span.textContent = 'DOWNLOADING DEMO...';
+        setTimeout(() => {
+          span.textContent = originalText;
+        }, 2500);
+      }
+    });
+  }
 
   // 6. Protocols Scroll-jacking Deck Slider (Desktop only)
   let currentProtocolIndex = 0;
@@ -689,5 +698,39 @@ document.addEventListener('DOMContentLoaded', () => {
       currentCharacterIndex = index;
       updateActiveCharacter(index);
     });
+  });
+
+  // 9. Video Sound Toggle Device (Mute/Unmute controller)
+  const soundToggles = document.querySelectorAll('.video-sound-toggle');
+  soundToggles.forEach(toggle => {
+    const targetId = toggle.getAttribute('data-target');
+    const video = document.getElementById(targetId);
+    const btn = toggle.querySelector('.sound-toggle-btn');
+    const muteIcon = toggle.querySelector('.sound-muted');
+    const unmuteIcon = toggle.querySelector('.sound-unmuted');
+    const soundText = toggle.querySelector('.sound-text');
+
+    if (video && btn) {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (video.muted) {
+          video.muted = false;
+          muteIcon.style.display = 'none';
+          unmuteIcon.style.display = 'inline';
+          soundText.textContent = 'SOUND ON';
+          btn.style.borderColor = 'var(--color-accent)';
+          btn.style.boxShadow = '0 0 10px rgba(150, 7, 3, 0.4)';
+        } else {
+          video.muted = true;
+          muteIcon.style.display = 'inline';
+          unmuteIcon.style.display = 'none';
+          soundText.textContent = 'SOUND OFF';
+          btn.style.borderColor = '';
+          btn.style.boxShadow = '';
+        }
+      });
+    }
   });
 });
