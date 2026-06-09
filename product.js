@@ -302,22 +302,86 @@ document.addEventListener('DOMContentLoaded', () => {
   initDeckMode();
   window.addEventListener('resize', initDeckMode);
 
-  // Wheel interceptor on window
+  // 6.5 Characters Scroll-jacking Deck Slider variables
+  let currentCharacterIndex = 0;
+  let isCharacterLocked = false;
+  let isCharTransitioning = false;
+  let charLockCooldown = false;
+
+  const charactersSection = document.getElementById('characters');
+  const charDots = document.querySelectorAll('.char-dot');
+  const charSlides = document.querySelectorAll('.character-slide');
+
+  const updateActiveCharacter = (index) => {
+    charDots.forEach((dot, idx) => {
+      if (idx === index) {
+        dot.classList.add('active');
+      } else {
+        dot.classList.remove('active');
+      }
+    });
+
+    charSlides.forEach((slide, idx) => {
+      if (idx === index) {
+        slide.classList.add('active');
+        const nameEl = slide.querySelector('.char-name');
+        if (nameEl) glitchText(nameEl);
+      } else {
+        slide.classList.remove('active');
+      }
+    });
+  };
+
+  const lockCharScrollAt = (index) => {
+    isCharacterLocked = true;
+    currentCharacterIndex = index;
+    updateActiveCharacter(currentCharacterIndex);
+    
+    window.scrollTo({
+      top: charactersSection.offsetTop,
+      behavior: 'smooth'
+    });
+
+    isCharTransitioning = true;
+    setTimeout(() => {
+      isCharTransitioning = false;
+    }, 1000);
+  };
+
+  const changeCharacter = (newIndex) => {
+    isCharTransitioning = true;
+    charactersSection.classList.add('glitching');
+    setTimeout(() => {
+      currentCharacterIndex = newIndex;
+      updateActiveCharacter(currentCharacterIndex);
+    }, 200);
+
+    setTimeout(() => {
+      charactersSection.classList.remove('glitching');
+      isCharTransitioning = false;
+    }, 800);
+  };
+
+  const unlockCharScroll = () => {
+    isCharacterLocked = false;
+    charLockCooldown = true;
+    setTimeout(() => {
+      charLockCooldown = false;
+    }, 1200);
+  };
+
+  // Wheel interceptor on window (Handles both Protocols and Characters sections)
   window.addEventListener('wheel', (e) => {
     if (window.innerWidth < 1025) return;
 
+    // --- PROTOCOLS SECTION LOCK ---
     const rect = protocolsSection.getBoundingClientRect();
-    const sectionTop = rect.top;
-
-    // 1. Lock Trigger: If not locked and cooldown is off, detect entrance
-    if (!isProtocolLocked && !lockCooldown) {
-      // Entering downwards (section top is entering the viewport)
+    if (!isProtocolLocked && !lockCooldown && !isCharacterLocked) {
       if (e.deltaY > 0 && rect.top < window.innerHeight - 50 && rect.bottom > window.innerHeight) {
         lockScrollAt(0);
         e.preventDefault();
         return;
       }
-      // Entering upwards (section bottom is entering the viewport)
       else if (e.deltaY < 0 && rect.bottom > 50 && rect.top < 0) {
         lockScrollAt(6);
         e.preventDefault();
@@ -325,7 +389,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // 2. Main lock cycling
     if (isProtocolLocked) {
       if (isTransitioning) {
         e.preventDefault();
@@ -333,22 +396,57 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (e.deltaY > 0) {
-        // Scroll down
         if (currentProtocolIndex < 6) {
           e.preventDefault();
           changeProtocol(currentProtocolIndex + 1);
         } else {
-          // At index 6, scroll down releases lock (allows normal scroll past it)
           unlockScroll('down');
         }
       } else if (e.deltaY < 0) {
-        // Scroll up
         if (currentProtocolIndex > 0) {
           e.preventDefault();
           changeProtocol(currentProtocolIndex - 1);
         } else {
-          // At index 0, scroll up releases lock (allows normal scroll past it)
           unlockScroll('up');
+        }
+      }
+      return;
+    }
+
+    // --- CHARACTERS SECTION LOCK ---
+    const charRect = charactersSection.getBoundingClientRect();
+    if (!isCharacterLocked && !charLockCooldown && !isProtocolLocked) {
+      if (e.deltaY > 0 && charRect.top < window.innerHeight - 50 && charRect.bottom > window.innerHeight) {
+        lockCharScrollAt(0);
+        e.preventDefault();
+        return;
+      }
+      else if (e.deltaY < 0 && charRect.bottom > 50 && charRect.top < 0) {
+        lockCharScrollAt(2);
+        e.preventDefault();
+        return;
+      }
+    }
+
+    if (isCharacterLocked) {
+      if (isCharTransitioning) {
+        e.preventDefault();
+        return;
+      }
+
+      if (e.deltaY > 0) {
+        if (currentCharacterIndex < 2) {
+          e.preventDefault();
+          changeCharacter(currentCharacterIndex + 1);
+        } else {
+          unlockCharScroll();
+        }
+      } else if (e.deltaY < 0) {
+        if (currentCharacterIndex > 0) {
+          e.preventDefault();
+          changeCharacter(currentCharacterIndex - 1);
+        } else {
+          unlockCharScroll();
         }
       }
     }
@@ -356,7 +454,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Touch event locking for laptop trackpads
   window.addEventListener('touchmove', (e) => {
-    if (isProtocolLocked) {
+    if (isProtocolLocked || isCharacterLocked) {
       e.preventDefault();
     }
   }, { passive: false });
@@ -368,10 +466,15 @@ document.addEventListener('DOMContentLoaded', () => {
       isProtocolLocked = false;
       lockCooldown = true;
       protocolsSection.classList.remove('glitching');
+
+      isCharacterLocked = false;
+      charLockCooldown = true;
+      if (charactersSection) charactersSection.classList.remove('glitching');
       
       // Temporary cooldown to allow smooth navigation scrolling
       setTimeout(() => {
         lockCooldown = false;
+        charLockCooldown = false;
       }, 1500);
     });
   });
@@ -575,27 +678,11 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // 8. Character Selection Pagination (Zelda Style Layout)
-  const charDots = document.querySelectorAll('.char-dot');
-  const charSlides = document.querySelectorAll('.character-slide');
-
   charDots.forEach(dot => {
     dot.addEventListener('click', () => {
       const index = parseInt(dot.getAttribute('data-char-index'));
-      
-      // Update active dot
-      charDots.forEach(d => d.classList.remove('active'));
-      dot.classList.add('active');
-
-      // Update active slide
-      charSlides.forEach(slide => {
-        slide.classList.remove('active');
-        if (parseInt(slide.getAttribute('data-slide-index')) === index) {
-          slide.classList.add('active');
-          // Scramble name glitch on switch
-          const nameEl = slide.querySelector('.char-name');
-          if (nameEl) glitchText(nameEl);
-        }
-      });
+      currentCharacterIndex = index;
+      updateActiveCharacter(index);
     });
   });
 });
