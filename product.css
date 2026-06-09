@@ -711,7 +711,7 @@ section {
 
 .protocol-img-col {
   flex: 1;
-  height: 360px;
+  height: 480px;
   overflow: hidden;
   position: relative;
   background-color: #0d0d0d;
@@ -752,7 +752,7 @@ section {
   }
   .protocol-img-col {
     width: 100%;
-    height: 240px;
+    height: 300px;
   }
   .protocol-content-col {
     width: 100%;
@@ -762,23 +762,24 @@ section {
 
 .protocol-num {
   font-family: var(--font-mono);
-  font-size: 18px;
+  font-size: 22px;
   color: var(--color-accent);
   letter-spacing: 2px;
 }
 
 .protocol-name {
   font-family: var(--font-title);
-  font-size: 42px;
+  font-size: 54px;
   color: var(--color-text-primary);
   letter-spacing: 1px;
 }
 
 .protocol-desc {
-  font-size: 18px;
-  line-height: 1.6;
+  font-family: var(--font-korean);
+  font-size: 20px;
+  line-height: 1.8;
   color: var(--color-text-secondary);
-  max-width: 448px;
+  max-width: 520px;
 }
 
 /* Section 5: Gameplay Flow */
@@ -1444,7 +1445,6 @@ section {
   color: var(--color-text-secondary);
 }
 
-.protocol-desc,
 .flow-step-tag,
 .platforms-intro,
 .editions-subtitle {
@@ -1532,7 +1532,7 @@ section {
   .section-protocols.deck-mode .protocols-list {
     position: relative;
     width: 100%;
-    height: 420px;
+    height: 540px;
     display: flex;
     justify-content: center;
     align-items: center;
