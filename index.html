@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Noto+Sans+KR:wght@100..900&family=Inter:wght@100..900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="index.css?v=1.1">
+  <link rel="stylesheet" href="index.css?v=1.2">
 </head>
 <body>
   
@@ -214,6 +214,14 @@
       </form>
     </div>
   </section>
+
+  <!-- Back to Top Button -->
+  <button id="back-to-top" class="back-to-top-btn" aria-label="Scroll to top">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+      <path d="M18 15l-6-6-6 6"/>
+    </svg>
+    <span class="btn-text">TO_SURFACE_</span>
+  </button>
 
   <!-- Footer -->
   <footer class="footer border-t-subtle">
@@ -447,6 +455,25 @@
       window.addEventListener('resize', handleScroll);
       handleScroll();
     })();
+
+    // Back to Top Button
+    const backToTopBtn = document.getElementById('back-to-top');
+    if (backToTopBtn) {
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+          backToTopBtn.classList.add('visible');
+        } else {
+          backToTopBtn.classList.remove('visible');
+        }
+      });
+
+      backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+    }
   </script>
   <script src="matrix-effect.js"></script>
 </body>
