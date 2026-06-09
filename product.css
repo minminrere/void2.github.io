@@ -2237,11 +2237,11 @@ section {
 }
 
 .system-row:nth-child(odd) .system-content-col {
-  padding: 60px 50px 60px max(64px, calc(50vw - 656px));
+  padding: 60px 40px 60px max(64px, calc(50vw - 656px));
 }
 
 .system-row:nth-child(even) .system-content-col {
-  padding: 60px max(64px, calc(50vw - 656px)) 60px 50px;
+  padding: 60px max(64px, calc(50vw - 656px)) 60px 40px;
 }
 
 .system-num {
@@ -2253,7 +2253,7 @@ section {
 
 .system-feature-name {
   font-family: var(--font-korean);
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 700;
   color: var(--color-text-primary);
   line-height: 1.3;
@@ -2298,7 +2298,7 @@ section {
     padding: 40px;
   }
   .system-feature-name {
-    font-size: 28px;
+    font-size: 24px;
   }
 }
 
@@ -2315,7 +2315,7 @@ section {
     padding: 32px 20px;
   }
   .system-feature-name {
-    font-size: 22px;
+    font-size: 20px;
   }
 }
 
