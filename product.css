@@ -65,12 +65,15 @@ body::before {
 p {
   line-height: 1.75;
   letter-spacing: -0.01em;
+  word-break: keep-all;
+  text-align: justify;
 }
 
-h1, h2, h3 {
+h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-title);
   font-weight: 500;
   letter-spacing: -0.02em;
+  word-break: keep-all;
 }
 
 /* Layout Utilities */
@@ -731,7 +734,7 @@ section {
 
 .protocol-content-col {
   flex: 1;
-  padding: 60px 80px;
+  padding: 60px max(64px, calc(50vw - 656px)) 60px 80px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -2227,11 +2230,18 @@ section {
 
 .system-content-col {
   flex: 1;
-  padding: 60px 80px;
   display: flex;
   flex-direction: column;
   gap: 20px;
   position: relative;
+}
+
+.system-row:nth-child(odd) .system-content-col {
+  padding: 60px 80px 60px max(64px, calc(50vw - 656px));
+}
+
+.system-row:nth-child(even) .system-content-col {
+  padding: 60px max(64px, calc(50vw - 656px)) 60px 80px;
 }
 
 .system-num {
@@ -2247,6 +2257,7 @@ section {
   font-weight: 700;
   color: var(--color-text-primary);
   line-height: 1.3;
+  word-break: keep-all;
 }
 
 .system-desc {
@@ -2282,7 +2293,8 @@ section {
 
 /* Responsive System Layout */
 @media (max-width: 1024px) {
-  .system-content-col {
+  .system-row:nth-child(odd) .system-content-col,
+  .system-row:nth-child(even) .system-content-col {
     padding: 40px;
   }
   .system-feature-name {
