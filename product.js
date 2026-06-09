@@ -419,4 +419,149 @@ document.addEventListener('DOMContentLoaded', () => {
       lockCooldown = false;
     }, 1200);
   }
+
+  // 7. Interactive Surveillance Feed Lightbox
+  const lightbox = document.createElement('div');
+  lightbox.classList.add('lightbox-overlay');
+  lightbox.innerHTML = `
+    <div class="lightbox-scanline"></div>
+    <div class="lightbox-header">
+      <div class="lightbox-cam-info">
+        <div class="lightbox-status-dot"></div>
+        <span class="lightbox-cam-id">CAM_00_UNKNOWN</span>
+      </div>
+      <span class="lightbox-cam-time">YYYY-MM-DD HH:MM:SS.MS</span>
+      <button class="lightbox-close-btn">&times; [ ESC ] CLOSE</button>
+    </div>
+    
+    <div class="lightbox-main">
+      <button class="lightbox-nav-btn prev-btn">&lt; PREV</button>
+      
+      <div class="lightbox-content-wrap">
+        <div class="lightbox-img-container">
+          <img class="lightbox-img" src="" alt="">
+        </div>
+        <div class="lightbox-caption">Loading...</div>
+      </div>
+      
+      <button class="lightbox-nav-btn next-btn">NEXT &gt;</button>
+    </div>
+    
+    <div class="lightbox-footer">
+      <span class="lightbox-sys-msg">SYSTEM STATUS: LINKING DECRYPTED SOURCE FEED...</span>
+      <span class="lightbox-counter">FEED [0/0]</span>
+    </div>
+  `;
+  document.body.appendChild(lightbox);
+
+  const lightboxImg = lightbox.querySelector('.lightbox-img');
+  const lightboxCaption = lightbox.querySelector('.lightbox-caption');
+  const lightboxCamId = lightbox.querySelector('.lightbox-cam-id');
+  const lightboxCamTime = lightbox.querySelector('.lightbox-cam-time');
+  const lightboxCloseBtn = lightbox.querySelector('.lightbox-close-btn');
+  const lightboxPrevBtn = lightbox.querySelector('.prev-btn');
+  const lightboxNextBtn = lightbox.querySelector('.next-btn');
+  const lightboxSysMsg = lightbox.querySelector('.lightbox-sys-msg');
+  const lightboxCounter = lightbox.querySelector('.lightbox-counter');
+
+  let currentFeedIndex = 0;
+  let lightboxInterval = null;
+
+  const updateLightboxContent = (index) => {
+    const item = feedItems[index];
+    if (!item) return;
+
+    // Glitch effect on image update
+    lightboxImg.classList.add('glitching');
+    
+    const imgSrc = item.querySelector('.feed-img-wrap img').getAttribute('src');
+    const imgAlt = item.querySelector('.feed-img-wrap img').getAttribute('alt');
+    const label = item.querySelector('.feed-label').textContent.trim();
+    const statusTxt = item.querySelector('.feed-status-txt').textContent.trim();
+
+    lightboxImg.setAttribute('src', imgSrc);
+    lightboxImg.setAttribute('alt', imgAlt);
+    lightboxCaption.textContent = label;
+    lightboxCamId.textContent = statusTxt;
+    lightboxCounter.textContent = `FEED [${index + 1}/${feedItems.length}]`;
+    
+    // Simulate system code name change
+    lightboxSysMsg.textContent = `SYSTEM STATUS: MONITORING ${statusTxt} // DECRYPTING DATA...`;
+
+    setTimeout(() => {
+      lightboxImg.classList.remove('glitching');
+    }, 250);
+  };
+
+  const startLightboxTime = (index) => {
+    if (lightboxInterval) clearInterval(lightboxInterval);
+    lightboxInterval = setInterval(() => {
+      const now = new Date();
+      const pad = (n) => String(n).padStart(2, '0');
+      const dateStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+      const timeStr = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+      const ms = String(now.getMilliseconds()).padStart(3, '0').substring(0, 2);
+      const fpsStr = index === 1 ? '14' : '29.9';
+      lightboxCamTime.textContent = `${dateStr} ${timeStr}.${ms} | FPS: ${fpsStr}`;
+    }, 66);
+  };
+
+  const openLightbox = (index) => {
+    currentFeedIndex = index;
+    updateLightboxContent(currentFeedIndex);
+    startLightboxTime(currentFeedIndex);
+    lightbox.classList.add('open');
+    document.body.style.overflow = 'hidden'; // prevent scrolling behind
+  };
+
+  const closeLightbox = () => {
+    lightbox.classList.remove('open');
+    document.body.style.overflow = '';
+    if (lightboxInterval) {
+      clearInterval(lightboxInterval);
+      lightboxInterval = null;
+    }
+  };
+
+  // Click handler for each surveillance item
+  feedItems.forEach((item, index) => {
+    item.addEventListener('click', () => {
+      openLightbox(index);
+    });
+  });
+
+  // Controls inside lightbox
+  lightboxCloseBtn.addEventListener('click', closeLightbox);
+  
+  lightboxPrevBtn.addEventListener('click', () => {
+    currentFeedIndex = (currentFeedIndex - 1 + feedItems.length) % feedItems.length;
+    updateLightboxContent(currentFeedIndex);
+    startLightboxTime(currentFeedIndex);
+  });
+
+  lightboxNextBtn.addEventListener('click', () => {
+    currentFeedIndex = (currentFeedIndex + 1) % feedItems.length;
+    updateLightboxContent(currentFeedIndex);
+    startLightboxTime(currentFeedIndex);
+  });
+
+  // Keyboard navigation
+  window.addEventListener('keydown', (e) => {
+    if (!lightbox.classList.contains('open')) return;
+
+    if (e.key === 'Escape') {
+      closeLightbox();
+    } else if (e.key === 'ArrowLeft') {
+      lightboxPrevBtn.click();
+    } else if (e.key === 'ArrowRight') {
+      lightboxNextBtn.click();
+    }
+  });
+
+  // Click on background to close (excluding controls and image wrapper)
+  lightbox.addEventListener('click', (e) => {
+    if (e.target === lightbox || e.target === lightbox.querySelector('.lightbox-main') || e.target === lightbox.querySelector('.lightbox-content-wrap')) {
+      closeLightbox();
+    }
+  });
 });
