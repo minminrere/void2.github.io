@@ -573,4 +573,29 @@ document.addEventListener('DOMContentLoaded', () => {
       closeLightbox();
     }
   });
+
+  // 8. Character Selection Tabs
+  const charTabs = document.querySelectorAll('.char-tab');
+  const charSlides = document.querySelectorAll('.character-slide');
+
+  charTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const index = parseInt(tab.getAttribute('data-char-index'));
+      
+      // Update active tab
+      charTabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+
+      // Update active slide
+      charSlides.forEach(slide => {
+        slide.classList.remove('active');
+        if (parseInt(slide.getAttribute('data-slide-index')) === index) {
+          slide.classList.add('active');
+          // Scramble name glitch on switch
+          const nameEl = slide.querySelector('.char-name');
+          if (nameEl) glitchText(nameEl);
+        }
+      });
+    });
+  });
 });
