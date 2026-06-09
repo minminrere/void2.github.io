@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // 4. Glitch Effect on Text Headers (Periodically & On Hover)
-  const glitchTargets = document.querySelectorAll('.hero-title, .about-quote, .cta-title, .pending-label');
+  const glitchTargets = document.querySelectorAll('.hero-title, .about-quote, .cta-title, .pending-label, .char-name');
   
   const glitchText = (el) => {
     const originalText = el.getAttribute('data-original') || el.innerText;
@@ -111,6 +111,15 @@ document.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => heroTitle.classList.remove('glitch-active'), 500);
     });
   }
+
+  // Add mouse cursor hover scramble effect on Character Names
+  const charNames = document.querySelectorAll('.char-name');
+  charNames.forEach(name => {
+    name.style.cursor = 'pointer';
+    name.addEventListener('mouseenter', () => {
+      glitchText(name);
+    });
+  });
 
   // Trigger random glitches every 6-10 seconds
   setInterval(() => {
