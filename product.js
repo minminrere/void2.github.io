@@ -370,19 +370,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 1200);
   };
 
-  // Wheel interceptor on window (Handles both Protocols and Characters sections)
+  // Wheel interceptor on window (Handles both Protocols and Characters sections with high-reliability triggers)
   window.addEventListener('wheel', (e) => {
     if (window.innerWidth < 1025) return;
+    if (!protocolsSection || !charactersSection) return;
 
     // --- PROTOCOLS SECTION LOCK ---
     const rect = protocolsSection.getBoundingClientRect();
     if (!isProtocolLocked && !lockCooldown && !isCharacterLocked) {
-      if (e.deltaY > 0 && rect.top < window.innerHeight - 50 && rect.bottom > window.innerHeight) {
+      // Entering downwards
+      if (e.deltaY > 0 && rect.top < window.innerHeight - 100 && rect.bottom > 100) {
         lockScrollAt(0);
         e.preventDefault();
         return;
       }
-      else if (e.deltaY < 0 && rect.bottom > 50 && rect.top < 0) {
+      // Entering upwards
+      else if (e.deltaY < 0 && rect.bottom > 100 && rect.top < window.innerHeight - 100) {
         lockScrollAt(6);
         e.preventDefault();
         return;
@@ -416,12 +419,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- CHARACTERS SECTION LOCK ---
     const charRect = charactersSection.getBoundingClientRect();
     if (!isCharacterLocked && !charLockCooldown && !isProtocolLocked) {
-      if (e.deltaY > 0 && charRect.top < window.innerHeight - 50 && charRect.bottom > window.innerHeight) {
+      // Entering downwards
+      if (e.deltaY > 0 && charRect.top < window.innerHeight - 100 && charRect.bottom > 100) {
         lockCharScrollAt(0);
         e.preventDefault();
         return;
       }
-      else if (e.deltaY < 0 && charRect.bottom > 50 && charRect.top < 0) {
+      // Entering upwards
+      else if (e.deltaY < 0 && charRect.bottom > 100 && charRect.top < window.innerHeight - 100) {
         lockCharScrollAt(2);
         e.preventDefault();
         return;
