@@ -179,13 +179,43 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. Scroll Actions & Header Visual State
     // ==========================================
     const header = document.getElementById('main-header');
+    const backToTopBtn = document.getElementById('back-to-top');
+
     window.addEventListener('scroll', () => {
         if (window.scrollY > 50) {
             header.classList.add('scrolled');
         } else {
             header.classList.remove('scrolled');
         }
+
+        if (backToTopBtn) {
+            if (window.scrollY > 300) {
+                backToTopBtn.classList.add('visible');
+            } else {
+                backToTopBtn.classList.remove('visible');
+            }
+        }
     });
+
+    if (backToTopBtn) {
+        backToTopBtn.addEventListener('click', () => {
+            // Reset fullpage scroll index to 0 (Hero)
+            currentSectionIdx = 0;
+            // Update side indicators
+            indicators.forEach(ind => {
+                if (ind.getAttribute('data-sec') === 'hero') {
+                    ind.classList.add('active');
+                } else {
+                    ind.classList.remove('active');
+                }
+            });
+
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    }
 
 
     // ==========================================

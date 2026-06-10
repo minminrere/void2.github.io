@@ -2950,3 +2950,69 @@ body.video-modal-open {
     width: 72px !important;
     height: 44px !important;
 }
+
+/* Back to Top Button */
+.back-to-top-btn {
+  position: fixed;
+  bottom: 90px;
+  right: 24px;
+  left: auto;
+  z-index: 999;
+  background: rgba(10, 0, 0, 0.85);
+  border: 1px solid var(--primary-red, #960703);
+  color: #ffffff;
+  padding: 12px 20px;
+  font-family: var(--font-inter, sans-serif);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  transform: translateY(20px);
+  pointer-events: none;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: buttonPulse 2s infinite alternate ease-in-out;
+}
+
+.back-to-top-btn.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.back-to-top-btn:hover {
+  background: var(--primary-red, #960703);
+  border-color: var(--primary-red, #960703);
+  color: #ffffff;
+  box-shadow: 0 0 25px rgba(150, 7, 3, 0.8);
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+  animation: none;
+}
+
+.back-to-top-btn svg {
+  transition: transform 0.3s ease;
+}
+
+.back-to-top-btn:hover svg {
+  transform: translateY(-2px);
+}
+
+@keyframes buttonPulse {
+  0% {
+    box-shadow: 0 0 8px rgba(150, 7, 3, 0.4);
+    border-color: rgba(150, 7, 3, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(150, 7, 3, 0.9);
+    border-color: rgba(150, 7, 3, 1);
+  }
+  100% {
+    box-shadow: 0 0 8px rgba(150, 7, 3, 0.4);
+    border-color: rgba(150, 7, 3, 0.5);
+  }
+}
