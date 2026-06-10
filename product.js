@@ -374,9 +374,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const unlockCharScroll = () => {
     isCharacterLocked = false;
     charLockCooldown = true;
+
+    const checkCharExit = () => {
+      const currentRect = charactersSection.getBoundingClientRect();
+      if (currentRect.bottom <= 0 || currentRect.top >= window.innerHeight) {
+        charLockCooldown = false;
+        window.removeEventListener('scroll', checkCharExit);
+      }
+    };
+    window.addEventListener('scroll', checkCharExit);
+
     setTimeout(() => {
       charLockCooldown = false;
-    }, 1200);
+      window.removeEventListener('scroll', checkCharExit);
+    }, 5000);
   };
 
   // Wheel interceptor on window (Handles both Protocols and Characters sections with high-reliability triggers)
@@ -540,10 +551,19 @@ document.addEventListener('DOMContentLoaded', () => {
     isProtocolLocked = false;
     lockCooldown = true;
 
-    // Cooldown prevents immediate re-locking while scrolling past
+    const checkExit = () => {
+      const currentRect = protocolsSection.getBoundingClientRect();
+      if (currentRect.bottom <= 0 || currentRect.top >= window.innerHeight) {
+        lockCooldown = false;
+        window.removeEventListener('scroll', checkExit);
+      }
+    };
+    window.addEventListener('scroll', checkExit);
+
     setTimeout(() => {
       lockCooldown = false;
-    }, 1200);
+      window.removeEventListener('scroll', checkExit);
+    }, 5000);
   }
 
   // 7. Interactive Surveillance Feed Lightbox
