@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     // 2. Scroll Actions & Header Visual State
     // ==========================================
-    const header = document.getElementById('main-header');
+    const header = document.querySelector('.navigation');
     const backToTopBtn = document.getElementById('back-to-top');
 
     window.addEventListener('scroll', () => {
