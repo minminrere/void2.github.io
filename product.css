@@ -90,7 +90,7 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-/* Header Styling */
+/* Obsolete Header-nav Styles (replaced by standardized .navigation from index.css)
 .header-nav {
   position: fixed;
   top: 0;
@@ -193,6 +193,7 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 0 15px rgba(150, 7, 3, 0.5);
   border-color: var(--color-accent);
 }
+*/
 
 /* Sections Base */
 section {

@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }, 7000);
 
   // 5. Interactive Protocol Console Modal
-  const protocolBtn = document.querySelector('.protocol-btn');
+  const protocolBtn = document.querySelector('.nav-button');
   
   // Create Console Modal Elements
   const modal = document.createElement('div');
@@ -474,7 +474,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { passive: false });
 
   // Reset lock when clicking navigation links in the header
-  const navClickables = document.querySelectorAll('.nav-links a, .logo, .protocol-btn');
+  const navClickables = document.querySelectorAll('.nav-links a, .nav-brand, .nav-button');
   navClickables.forEach(link => {
     link.addEventListener('click', () => {
       isProtocolLocked = false;
